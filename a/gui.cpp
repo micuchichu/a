@@ -1,6 +1,11 @@
 #include "gui.h"
 
 // Button //
+Button::Button()
+{
+	size = { 0 };
+}
+
 Texture2D Button::getTexture()
 {
 	return texture;
@@ -11,14 +16,37 @@ void Button::setPos(int x, int y)
 	pos = { (float)x, (float)y };
 }
 
-void Button::setFunc(std::function<void()> func) {
+void Button::setSize(int width, int height)
+{
+	size = { (float)width, (float)height };
+}
+
+void Button::setText(std::string newText)
+{
+	text = newText;
+}
+
+void Button::setColor(Color color)
+{
+	col = color;
+}
+
+void Button::setFunc(std::function<void()> func) 
+{
 	function_ = func;
 }
 
-void Button::DrawButton()
+void Button::DrawButton(bool drawText)
 {
-	DrawTexture(texture, pos.x, pos.y, RAYWHITE);
-
+	if (drawText)
+	{
+		DrawRectangle(pos.x, pos.y, size.x, size.y, col);
+		DrawText(text.c_str(), pos.x + 3, pos.y, 20, WHITE);
+	}
+	else
+	{
+		DrawTexture(texture, pos.x, pos.y, RAYWHITE);
+	}
 }
 
 void Button::DrawButton(float size)
@@ -28,10 +56,21 @@ void Button::DrawButton(float size)
 
 void Button::Clicked(Vector2 MousePos)
 {
-	if (MousePos.x < pos.x + texture.width && MousePos.x > pos.x &&
-		MousePos.y < pos.y + texture.height && MousePos.y > pos.y)
-		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
-			function_();
+	if (size.x == -1)
+	{
+		if (MousePos.x < pos.x + texture.width && MousePos.x > pos.x &&
+			MousePos.y < pos.y + texture.height && MousePos.y > pos.y)
+			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+				function_();
+	}
+	else
+	{
+		if (MousePos.x < pos.x + size.x && MousePos.x > pos.x &&
+			MousePos.y < pos.y + size.y && MousePos.y > pos.y)
+			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+				function_();
+	}
+
 }
 
 void Button::Clicked()
