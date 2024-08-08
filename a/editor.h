@@ -6,7 +6,6 @@
 #include "gui.h"
 #include "scene.h"
 
-
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -29,6 +28,7 @@ public:
 	void Draw() override;
 	void Update() override;
 	void BackgroundUpdates() override;
+	void OnSwitch() override;
 
 private:
 	// Load functions
@@ -60,10 +60,6 @@ private:
 
 	void calculateResources();
 	void loadSaves();
-
-	// Mesh related functions
-	void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector3 pos, float width, float height, float depth, Color color);
-	Model createSingleModel(char tiles[sizeY][sizeX], Vector3 pos = { 0 });
 
 	// Data
 	int stoneTotal = 0;

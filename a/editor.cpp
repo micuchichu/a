@@ -47,7 +47,7 @@ void Editor::Update()
 {
 	len = 0;
 	len2 = 0;
-	UpdateCamera(&cam3d);
+	UpdateCameraNew(&cam3d, CAMERA_ORBITAL);
 	
 	updateTiles();
 
@@ -82,6 +82,12 @@ void Editor::BackgroundUpdates()
 	{
 		onWindowResize();
 	}
+}
+
+void Editor::OnSwitch()
+{
+	ShowCursor();
+	EnableCursor();
 }
 
 //******************************
@@ -206,6 +212,7 @@ void Editor::updateSaveMenu()
 				save << tiles[i][j] << " ";
 			}
 		}
+		save << floors;
 
 		saveName.clear();
 	}
@@ -244,7 +251,11 @@ void Editor::updateLoadMenu()
 					load >> tiles[i][j];
 				}
 			}
+			if (!load.eof())
+				load >> floors;
 		}
+		
+		model = createSingleModel(tiles, floors);
 	}
 	else if (IsKeyPressed(KEY_DELETE))
 	{
@@ -279,11 +290,17 @@ void Editor::updateTiles()
 		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
 		{
 			updateLeftClickRelease();
+			model = createSingleModel(tiles, floors);
 		}
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
 			updateRightClickPressed(mouse);
+		}
+
+		if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
+		{
+			model = createSingleModel(tiles, floors);
 		}
 	}
 }
@@ -419,7 +436,7 @@ void Editor::updateLeftClickPressed(Vector2& mouse)
 		A = { (float)x, (float)y };
 		break;
 	}
-	model = createSingleModel(tiles);
+	model = createSingleModel(tiles, floors);
 }
 
 void Editor::updateRightClickPressed(Vector2& mouse)
@@ -586,194 +603,4 @@ void Editor::initCamera()
 	cam3d.up = { 0, 1, 0 };
 
 	SetCameraMode(cam3d, CAMERA_FREE);
-}
-
-// Mesh Functions
-
-void Editor::addCubeVertices(Vector3 * vertices, Color * colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector3 pos, float width, float height, float depth, Color color)
-{
-	Vector3 cubeVertices[] = {
-		{ pos.x, pos.y, pos.z },
-		{ pos.x + width, pos.y, pos.z },
-		{ pos.x, pos.y + height, pos.z },
-		{ pos.x + width, pos.y + height, pos.z },
-		{ pos.x, pos.y, pos.z + depth },
-		{ pos.x + width, pos.y, pos.z + depth },
-		{ pos.x, pos.y + height, pos.z + depth },
-		{ pos.x + width, pos.y + height, pos.z + depth}
-	};
-
-	unsigned short cubeIndices[36] = {
-		// Front face
-		2, 1, 0, 2, 3, 1,
-		// Right face
-		7, 5, 1, 1, 3, 7,
-		// Back face
-		6, 4, 5, 5, 7, 6,
-		// Left face
-		2, 0, 4, 4, 6, 2,
-		// Top face
-		2, 6, 7, 7, 3, 2,
-		// Bottom face
-		5, 4, 0, 0, 1, 5
-	};
-
-	for (int i = 0; i < 8; i++)
-	{
-		vertices[*vertexCount] = cubeVertices[i];
-		colors[*vertexCount] = color;
-		(*vertexCount)++;
-	}
-
-	for (int i = 0; i < 36; i++)
-	{
-		indices[*indexCount] = cubeIndices[i] + (*vertexCount) - 8;
-		(*indexCount)++;
-	}
-}
-
-Model Editor::createSingleModel(char tiles[sizeY][sizeX], Vector3 pos)
-{
-	int maxVertices = sizeX * sizeY * floors * 8;
-	int maxIndices = sizeX * sizeY * floors * 36;
-
-	int visited[sizeY][sizeX] = { 0 };
-
-	Vector3* vertices = (Vector3*)malloc(maxVertices * sizeof(Vector3));
-	Color* colors = (Color*)malloc(maxVertices * sizeof(Color));
-	unsigned short* indices = (unsigned short*)malloc(maxIndices * sizeof(unsigned short));
-
-	int vertexCount = 0;
-	int indexCount = 0;
-
-	for (int i = 0; i < sizeY; i++)
-	{
-		for (int j = 0; j < sizeX; j++)
-		{
-			char type = tiles[i][j];
-			Color color;
-			float height;
-			Vector3 pos;
-
-			switch (type)
-			{
-			case 0:
-				color = RED;
-				height = 4.0f * (floors - 1) + 1.0f;
-				pos = { (float)j, 0, (float)i };
-
-				addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, pos, 1.0f, height, 1.0f, color);
-				continue;
-			case 1:
-				color = GREEN;
-				height = 1.0f;
-				break;
-			case 2:
-				color = BLUE;
-				height = 0.5f;
-				break;
-			default:
-				continue;
-			}
-
-			int width = 0, length = 0;
-
-			if (tiles[i][j] > 0 && visited[i][j] == 0)
-			{
-				int value = tiles[i][j];
-
-				for (int col = j; col < sizeX && tiles[i][col] == value && visited[i][col] == 0; col++)
-					width++;
-
-				for (int row = i; row < sizeY && tiles[row][j] == value && visited[row][j] == 0; row++)
-					length++;
-
-				for (int x = i; x < i + length; x++)
-					for (int y = j; y < j + width; y++)
-						if(tiles[x][y] == value)
-							visited[x][y] = 1;
-
-				for (int k = 0; k < floors; k++)
-				{
-					float yPos = k * 4.0f;
-					if (type == 0 && k == floors - 1)
-					{
-						height = 1.0f;
-					}
-
-					pos = { (float)j, yPos, (float)i };
-
-					addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, pos, width, height, length, color);
-				}
-			}
-		}
-	}
-
-	Model model = LoadModelFromMesh({ 0 });
-
-	model.meshCount = (vertexCount + 65520 - 1) / 65520;
-
-	Vector3** splitVertices = (Vector3**)malloc(model.meshCount * sizeof(Vector3*));
-	Color** splitColors = (Color**)malloc(model.meshCount * sizeof(Color*));
-	unsigned short** splitIndices = (unsigned short**)malloc(model.meshCount * sizeof(unsigned short*));
-	int* vertexCounts = (int*)malloc(model.meshCount * sizeof(int));
-	int* indexCounts = (int*)malloc(model.meshCount * sizeof(int));
-
-	int vertexOffset = 0, indexOffset = 0;
-
-	for (int i = 0; i < model.meshCount; i++)
-	{
-		int currentVertexCount = (i == model.meshCount - 1) ? (vertexCount % 65520) : 65520;
-
-		if (currentVertexCount == 0 && i == model.meshCount - 1)
-			currentVertexCount = 65520;
-
-		int currentIndexCount = 4.5 * currentVertexCount;
-
-		splitVertices[i] = vertices + vertexOffset;
-		splitIndices[i] = indices + indexOffset;
-		splitColors[i] = colors + vertexOffset;
-
-		vertexCounts[i] = currentVertexCount;
-		indexCounts[i] = currentIndexCount;
-
-		vertexOffset += currentVertexCount + model.meshCount * 8;
-		indexOffset += currentIndexCount + model.meshCount * 36;
-	}
-
-	Mesh* meshes = (Mesh*)malloc(model.meshCount * sizeof(Mesh));
-
-	for (int i = 0; i < model.meshCount; i++)
-	{
-		Mesh mesh = { 0 };
-		mesh.vertexCount = vertexCounts[i];
-		mesh.triangleCount = indexCounts[i] / 3;
-
-		mesh.vertices = (float*)splitVertices[i];
-
-		mesh.indices = splitIndices[i];
-		mesh.colors = (unsigned char*)splitColors[i];
-
-		UploadMesh(&mesh, true);
-
-		meshes[i] = mesh;
-	}
-
-	model.meshes = meshes;
-
-	model.materialCount = 1;
-
-	UpdateTransform(model, { 0, 0, 0 });
-	free(vertices);
-	free(splitVertices);
-	free(vertexCounts);
-
-	free(indices);
-	free(splitIndices);
-	free(indexCounts);
-
-	free(colors);
-	free(splitColors);
-
-	return model;
 }

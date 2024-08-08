@@ -18,12 +18,9 @@ int main()
 
 	SetTargetFPS(60);
 
-	Editor editor;
-	Planner planner;
-
-	Scene *scenes[SCENE_COUNT];
-	scenes[0] = &editor;
-	scenes[1] = &planner;
+	Scene* scenes[SCENE_COUNT];
+	scenes[0] = new Editor;
+	scenes[1] = new Planner;
 
 	int menu = EDITOR;
 
@@ -34,7 +31,11 @@ int main()
 		for (int i = 0; i < SCENE_COUNT; i++)
 			scenes[i]->BackgroundUpdates();
 
-		if (IsKeyPressed('D')) menu++;
+		if (IsKeyPressed('N'))
+		{
+			menu++;
+			scenes[menu]->OnSwitch();
+		}
 
 		if (menu > SCENE_COUNT - 1) menu = 0;
 

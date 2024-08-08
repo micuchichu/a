@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor.h" />
+    <ClInclude Include="globals.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="planner.h" />
     <ClInclude Include="scene.h" />
