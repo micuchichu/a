@@ -187,6 +187,8 @@ void Editor::updateModel()
 	for (int i = 0; i < model.meshCount; i++)
 		DrawMesh(model.meshes[i], LoadMaterialDefault(), model.transform);
 
+	DrawModelWires(model, {0, 0, 0}, 1, BLACK);
+
 	EndMode3D();
 
 	EndTextureMode();

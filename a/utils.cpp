@@ -118,13 +118,23 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 				for (int col = j; col < sizeX && tiles[i][col] == value && visited[i][col] == 0; col++)
 					width++;
 
-				for (int row = i; row < sizeY && tiles[row][j] == value && visited[row][j] == 0; row++)
-					length++;
+                for (int row = i; row < sizeY && tiles[row][j] == value && visited[row][j] == 0; row++)
+                {
+                    int col = j;
+                    while (col < sizeX && tiles[row][col] == value && visited[row][col] == 0)
+                        col++;
+
+                    if (col - j != width)
+                        break;
+                    length++;
+                }
 
 				for (int x = i; x < i + length; x++)
-					for (int y = j; y < j + width; y++)
-						if (tiles[x][y] == value)
-							visited[x][y] = 1;
+                    for (int y = j; y < j + width; y++)
+                    {
+                        if (tiles[x][y] == value)
+                            visited[x][y] = 1;
+                    }
 
 				for (int k = 0; k < floors; k++)
 				{
@@ -459,18 +469,17 @@ void UpdateCameraNew(Camera* camera, int mode)
     bool lockView = ((mode == CAMERA_FREE) || (mode == CAMERA_FIRST_PERSON) || (mode == CAMERA_THIRD_PERSON) || (mode == CAMERA_ORBITAL));
     bool rotateUp = false;
 
-    if (mode == CAMERA_CUSTOM) {}
-    else if (mode == CAMERA_ORBITAL)
+    if (mode == CAMERA_ORBITAL)
     {
         // Orbital can just orbit
         Matrix rotation = MatrixRotate(GetCameraUp(camera), CAMERA_ORBITAL_SPEED * GetFrameTime());
         Vector3 view = Vector3Subtract(camera->position, camera->target);
         view = Vector3Transform(view, rotation);
         camera->position = Vector3Add(camera->target, view);
+        CameraMoveToTarget(camera, -GetMouseWheelMove());
     }
     else
     {
-        // Camera rotation
         if (IsKeyDown(KEY_DOWN)) CameraPitch(camera, -CAMERA_ROTATION_SPEED, lockView, rotateAroundTarget, rotateUp);
         if (IsKeyDown(KEY_UP)) CameraPitch(camera, CAMERA_ROTATION_SPEED, lockView, rotateAroundTarget, rotateUp);
         if (IsKeyDown(KEY_RIGHT)) CameraYaw(camera, -CAMERA_ROTATION_SPEED, rotateAroundTarget);
@@ -486,16 +495,14 @@ void UpdateCameraNew(Camera* camera, int mode)
         }
         else
         {
-            // Mouse support
             CameraYaw(camera, -mousePositionDelta.x * CAMERA_MOUSE_MOVE_SENSITIVITY, rotateAroundTarget);
             CameraPitch(camera, -mousePositionDelta.y * CAMERA_MOUSE_MOVE_SENSITIVITY, lockView, rotateAroundTarget, rotateUp);
         }
 
-        // Keyboard support
-        if (IsKeyDown(KEY_W)) CameraMoveForward(camera, CAMERA_MOVE_SPEED, moveInWorldPlane);
-        if (IsKeyDown(KEY_A)) CameraMoveRight(camera, -CAMERA_MOVE_SPEED, moveInWorldPlane);
-        if (IsKeyDown(KEY_S)) CameraMoveForward(camera, -CAMERA_MOVE_SPEED, moveInWorldPlane);
-        if (IsKeyDown(KEY_D)) CameraMoveRight(camera, CAMERA_MOVE_SPEED, moveInWorldPlane);
+        if (IsKeyDown(KEY_W)) CameraMoveForward(camera, CAMERA_MOVE_SPEED, true);
+        if (IsKeyDown(KEY_A)) CameraMoveRight(camera, -CAMERA_MOVE_SPEED, true);
+        if (IsKeyDown(KEY_S)) CameraMoveForward(camera, -CAMERA_MOVE_SPEED, true);
+        if (IsKeyDown(KEY_D)) CameraMoveRight(camera, CAMERA_MOVE_SPEED, true);
 
         if (mode == CAMERA_FREE)
         {
@@ -506,14 +513,11 @@ void UpdateCameraNew(Camera* camera, int mode)
         }
     }
 
-    if ((mode == CAMERA_THIRD_PERSON) || (mode == CAMERA_ORBITAL) || (mode == CAMERA_FREE))
+    if (mode == CAMERA_FREE)
     {
         if (GetMouseWheelMove() > 0)
             CAMERA_MOVE_SPEED *= 1.1f;
         else if(GetMouseWheelMove() < 0)
             CAMERA_MOVE_SPEED /= 1.1f;
-
-        if (IsKeyPressed(KEY_KP_SUBTRACT)) CameraMoveToTarget(camera, 2.0f);
-        if (IsKeyPressed(KEY_KP_ADD)) CameraMoveToTarget(camera, -2.0f);
     }
 }

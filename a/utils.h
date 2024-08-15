@@ -4,6 +4,7 @@
 #include "raymath.h"
 #include "globals.h"
 
+#include <iostream>
 #include <cmath>
 
 void fillDFS(int x, int y, char oldColor, char newColor, char tiles[sizeX][sizeY]);

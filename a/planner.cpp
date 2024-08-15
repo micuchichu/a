@@ -12,14 +12,22 @@ void Planner::Update()
 		loadModels();
 
 	UpdateCameraNew(&cam3d, CAMERA_FREE);
+
+	if (IsKeyPressed('L'))
+	{
+
+	}
 }
 
 void Planner::Draw()
 {
 	BeginMode3D(cam3d);
 	for (int i = 0; i < blocs.size(); i++)
+	{
 		for (int j = 0; j < blocs[i].meshCount; j++)
 			DrawMesh(blocs[i].meshes[j], LoadMaterialDefault(), blocs[i].transform);
+		DrawModelWires(blocs[i], { blocs[i].transform.m3, blocs[i].transform.m7, blocs[i].transform.m11 }, 1, BLACK);
+	}
 	EndMode3D();
 }
 
@@ -69,7 +77,7 @@ void Planner::loadModels()
 				load >> floors;
 
 			std::cout << entry.path().string() << std::endl;
-			Model model = createSingleModel(tiles, floors, {40.0f * count, 0, 0});
+			Model model = createSingleModel(tiles, floors, {60.0f * count, 0, 0});
 			blocs.push_back(model);
 			count++;
 		}
@@ -83,7 +91,7 @@ void Planner::initCamera()
 	cam.target = { 0, 0 };
 	cam.zoom = 1;
 
-	cam3d.fovy = 45;
+	cam3d.fovy = 60;
 	cam3d.position = { 0.0f, 40, 0.0f };
 	cam3d.projection = CAMERA_PERSPECTIVE;
 	cam3d.target = { sizeX / 2, 10, sizeY / 2 };
