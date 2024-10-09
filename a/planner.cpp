@@ -4,6 +4,11 @@ Planner::Planner()
 {
 	initCamera();
 	loadModels();
+	for (int i = 0; i < blocs.size(); i++)
+	{
+		blocs[i].materials[0] = LoadMaterialDefault();
+		blocs[i].materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = LoadTexture("textures/pillar.png");
+	}
 }
 
 void Planner::Update()
@@ -24,9 +29,11 @@ void Planner::Draw()
 	BeginMode3D(cam3d);
 	for (int i = 0; i < blocs.size(); i++)
 	{
-		for (int j = 0; j < blocs[i].meshCount; j++)
-			DrawMesh(blocs[i].meshes[j], LoadMaterialDefault(), blocs[i].transform);
-		DrawModelWires(blocs[i], { blocs[i].transform.m3, blocs[i].transform.m7, blocs[i].transform.m11 }, 1, BLACK);
+		//for (int j = 0; j < blocs[i].meshCount; j++)
+		//	DrawMesh(blocs[i].meshes[j], LoadMaterialDefault(), blocs[i].transform);
+		DrawModel(blocs[i], {i * 60.0f, 0, 0}, 1, WHITE);
+
+		//DrawModelWires(blocs[i], { blocs[i].transform.m3, blocs[i].transform.m7, blocs[i].transform.m11 }, 1, BLACK);
 	}
 	EndMode3D();
 }

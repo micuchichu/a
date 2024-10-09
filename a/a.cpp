@@ -18,6 +18,10 @@ int main()
 
 	SetTargetFPS(60);
 
+	rlImGuiSetup(true);
+
+	ImGuiStyleSetup();
+
 	Scene* scenes[SCENE_COUNT];
 	scenes[0] = new Editor;
 	scenes[1] = new Planner;
@@ -41,8 +45,12 @@ int main()
 
 		BeginDrawing();
 		ClearBackground(WHITE);
+		rlImGuiBegin();
 
+		//ImGui::ShowDemoWindow();
 		scenes[menu]->Draw();
+
+		rlImGuiEnd();
 
 		EndDrawing();
 	}

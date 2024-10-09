@@ -1,6 +1,9 @@
 #pragma once
 
 #include "raylib.h"
+#include "imgui.h"
+#include "rlImGui.h"
+
 #include "utils.h"
 #include "globals.h"
 #include "gui.h"
@@ -78,9 +81,10 @@ private:
 
 	// save/load related
 	std::vector<std::string> saves;
+	char buf[32];
 	std::string saveName;
-	Button closeSave;
-	Button closeLoad;
+	bool closeSave;
+	bool closeLoad;
 
 	int currentSave = 0;
 
@@ -101,4 +105,6 @@ private:
 
 	Camera2D cam;
 	Camera cam3d;
+
+	Material bloc;
 };

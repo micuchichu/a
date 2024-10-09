@@ -4,11 +4,15 @@ Editor::Editor()
 {
 	initCamera();
 	initTools();
+	bloc = LoadMaterialDefault();
+	bloc.maps[MATERIAL_MAP_DIFFUSE].texture = build[1].getTexture();
 }
 
 void Editor::Draw()
 {
-	DrawTexturePro(view3D.texture, { 0, 0, (float)view3D.texture.width, -(float)view3D.texture.height }, { GetScreenWidth() * 0.5f - 100, 0, (float)view3D.texture.width, (float)view3D.texture.height }, { 0, 0 }, 0, WHITE);
+	//DrawTexturePro(view3D.texture, { 0, 0, (float)view3D.texture.width, -(float)view3D.texture.height }, { GetScreenWidth() * 0.5f - 100, 0, (float)view3D.texture.width, (float)view3D.texture.height }, { 0, 0 }, 0, WHITE);
+
+	rlImGuiImageRenderTexture(&view3D);
 
 	BeginMode2D(cam);
 
@@ -100,12 +104,30 @@ void Editor::OnSwitch()
 
 void Editor::drawTotals(int x, int y)
 {
-	DrawText(TextFormat("Stone: %d", stoneTotal), x + 10, y + 10, 30, GRAY);
-	DrawText(TextFormat("Slabs: %d", slabTotal), x + 10, y + 40, 30, GRAY);
-	DrawText(TextFormat("Walls: %d", wallTotal), x + 10, y + 70, 30, GRAY);
-	DrawText(TextFormat("Concrete: %d", concreteTotal), x + 10, y + 100, 30, GRAY);
-	DrawText(TextFormat("Floors: %d", floors - 1), x + 10, y + 130, 30, GRAY);
-	DrawText(TextFormat("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal), x + 190, y + 10, 30, GRAY);
+	bool p_open = true;
+	int flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+	
+	ImGui::SetNextWindowPos({ 10, 10 }, ImGuiCond_Always, {0, 0});
+	
+	ImGui::Begin("Resources", &p_open, flags);
+	
+	ImGui::Text("Stone: %d", stoneTotal);
+	ImGui::Text("Slabs: %d", slabTotal);
+	ImGui::Text("Walls: %d", wallTotal);
+	ImGui::Text("Concrete: %d", concreteTotal);
+	ImGui::Text("Floors: %d", floors - 1);
+	ImGui::Text("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal);
+
+	ImGui::End();
+
+	// OLD UI:
+	//DrawText(TextFormat("Stone: %d", stoneTotal), x + 10, y + 10, 30, GRAY);
+	//DrawText(TextFormat("Slabs: %d", slabTotal), x + 10, y + 40, 30, GRAY);
+	//DrawText(TextFormat("Walls: %d", wallTotal), x + 10, y + 70, 30, GRAY);
+	//DrawText(TextFormat("Concrete: %d", concreteTotal), x + 10, y + 100, 30, GRAY);
+	//DrawText(TextFormat("Floors: %d", floors - 1), x + 10, y + 130, 30, GRAY);
+	//DrawText(TextFormat("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal), x + 190, y + 10, 30, GRAY
+
 }
 
 void Editor::drawTile(char type, int x, int y)
@@ -127,23 +149,38 @@ void Editor::drawTile(char type, int x, int y)
 
 void Editor::drawSaveMenu()
 {
-	DrawRectangle(GetScreenWidth() / 2 - 200, GetScreenHeight() / 2 - 32, 400, 60, { 0, 0, 0, 200 });
-	DrawText("Save name:", GetScreenWidth() / 2 - 190, GetScreenHeight() / 2 - 30, 30, WHITE);
-	DrawText(saveName.c_str(), GetScreenWidth() / 2 - 190, GetScreenHeight() / 2, 20, WHITE);
-	closeSave.DrawButton(true);
+	int flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove;
+
+	ImGui::SetNextWindowPos({ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f }, ImGuiCond_Always, { 0, 0 });
+
+	//ImGui::Begin("Save", &p_open, flags);
+	ImGui::BeginPopup("niga", flags);
+
+	if (closeSave = ImGui::SmallButton("x"))
+		ImGui::CloseCurrentPopup();
+	ImGui::InputText("", buf, 32);
+	ImGui::SameLine();
+	closeSave = ImGui::SmallButton("Save");
+
+	ImGui::EndPopup();
+	// OLD UI:
+	//DrawRectangle(GetScreenWidth() / 2 - 200, GetScreenHeight() / 2 - 32, 400, 60, { 0, 0, 0, 200 });
+	//DrawText("Save name:", GetScreenWidth() / 2 - 190, GetScreenHeight() / 2 - 30, 30, WHITE);
+	//DrawText(saveName.c_str(), GetScreenWidth() / 2 - 190, GetScreenHeight() / 2, 20, WHITE);
+	//closeSave.DrawButton(true);
 }
 
 void Editor::drawLoadMenu()
 {
-	DrawRectangle(GetScreenWidth() / 2 - 200, 100, 400, GetScreenHeight() - 100, { 0, 0, 0, 200 });
-	DrawText("Pick a save to load", GetScreenWidth() / 2 - 190, 110, 30, WHITE);
+	//DrawRectangle(GetScreenWidth() / 2 - 200, 100, 400, GetScreenHeight() - 100, { 0, 0, 0, 200 });
+	//DrawText("Pick a save to load", GetScreenWidth() / 2 - 190, 110, 30, WHITE);
 
-	for (int i = 0; i < saves.size(); i++)
-	{
-		DrawText(saves[i].c_str(), GetScreenWidth() / 2 - 190, 150 + i * 20, 20, WHITE);
-	}
-	DrawRectangleLines(GetScreenWidth() / 2 - 200, 150 + currentSave * 20, 400, 20, WHITE);
-	closeLoad.DrawButton(true);
+	//for (int i = 0; i < saves.size(); i++)
+	//{
+	//	DrawText(saves[i].c_str(), GetScreenWidth() / 2 - 190, 150 + i * 20, 20, WHITE);
+	//}
+	//DrawRectangleLines(GetScreenWidth() / 2 - 200, 150 + currentSave * 20, 400, 20, WHITE);
+	//closeLoad.DrawButton(true);
 }
 
 void Editor::drawTiles()
@@ -171,8 +208,8 @@ void Editor::onWindowResize()
 	build[1].setPos(GetScreenWidth() / 2, GetScreenHeight() - 32);
 	build[2].setPos(GetScreenWidth() / 2 + 32, GetScreenHeight() - 32);
 
-	closeSave.setPos(GetScreenWidth() / 2 + 180, GetScreenHeight() / 2 - 32);
-	closeLoad.setPos(GetScreenWidth() / 2 + 180, 100);
+	//closeSave.setPos(GetScreenWidth() / 2 + 180, GetScreenHeight() / 2 - 32);
+	//closeLoad.setPos(GetScreenWidth() / 2 + 180, 100);
 
 	view3D = LoadRenderTexture(GetScreenWidth() / 2 + 100, GetScreenHeight());
 }
@@ -185,9 +222,10 @@ void Editor::updateModel()
 	BeginMode3D(cam3d);
 
 	for (int i = 0; i < model.meshCount; i++)
-		DrawMesh(model.meshes[i], LoadMaterialDefault(), model.transform);
+		DrawMesh(model.meshes[i], bloc, model.transform);
+	//DrawModel(model, { 0, 0, 0 }, 1, WHITE);
 
-	DrawModelWires(model, {0, 0, 0}, 1, BLACK);
+	//DrawModelWires(model, {0, 0, 0}, 1, BLACK);
 
 	EndMode3D();
 
@@ -196,7 +234,10 @@ void Editor::updateModel()
 
 void Editor::updateSaveMenu()
 {
-	char n = GetCharPressed();
+	if (closeSave)
+		ImGui::CloseCurrentPopup();
+
+	/*char n = GetCharPressed();
 
 	if (IsKeyPressed(KEY_BACKSPACE) && saveName.size() > 0)
 	{
@@ -211,7 +252,7 @@ void Editor::updateSaveMenu()
 		{
 			for (int j = 0; j < sizeX; j++)
 			{
-				save << tiles[i][j] << " ";
+				save << tiles[i][j] << " "; 
 			}
 		}
 		save << floors;
@@ -223,53 +264,53 @@ void Editor::updateSaveMenu()
 		saveName.push_back(n);
 	}
 
-	closeSave.Clicked();
+	closeSave.Clicked();*/
 }
 
 void Editor::updateLoadMenu()
 {
-	if (IsKeyPressed(KEY_DOWN))
-	{
-		if (currentSave < saves.size() - 1)
-			currentSave++;
-	}
-	else if (IsKeyPressed(KEY_UP))
-	{
-		if (currentSave > 0)
-			currentSave--;
-	}
-	else if (IsKeyPressed(KEY_ENTER))
-	{
-		loadMenu = false;
+	//if (IsKeyPressed(KEY_DOWN))
+	//{
+	//	if (currentSave < saves.size() - 1)
+	//		currentSave++;
+	//}
+	//else if (IsKeyPressed(KEY_UP))
+	//{
+	//	if (currentSave > 0)
+	//		currentSave--;
+	//}
+	//else if (IsKeyPressed(KEY_ENTER))
+	//{
+	//	loadMenu = false;
 
-		if (saves.size())
-		{
-			std::ifstream load(saves[currentSave]);
+	//	if (saves.size())
+	//	{
+	//		std::ifstream load(saves[currentSave]);
 
-			for (int i = 0; i < sizeY; i++)
-			{
-				for (int j = 0; j < sizeX; j++)
-				{
-					load >> tiles[i][j];
-				}
-			}
-			if (!load.eof())
-				load >> floors;
-		}
-		
-		model = createSingleModel(tiles, floors);
-	}
-	else if (IsKeyPressed(KEY_DELETE))
-	{
-		std::remove(saves[currentSave].c_str());
-		
-		loadSaves();
-		
-		if(currentSave > 0)
-			currentSave--;
-	}
-	
-	closeLoad.Clicked();
+	//		for (int i = 0; i < sizeY; i++)
+	//		{
+	//			for (int j = 0; j < sizeX; j++)
+	//			{
+	//				load >> tiles[i][j];
+	//			}
+	//		}
+	//		if (!load.eof())
+	//			load >> floors;
+	//	}
+	//	
+	//	model = createSingleModel(tiles, floors);
+	//}
+	//else if (IsKeyPressed(KEY_DELETE))
+	//{
+	//	std::remove(saves[currentSave].c_str());
+	//	
+	//	loadSaves();
+	//	
+	//	if(currentSave > 0)
+	//		currentSave--;
+	//}
+	//
+	//closeLoad.Clicked();
 }
 
 void Editor::updateTiles()
@@ -293,6 +334,7 @@ void Editor::updateTiles()
 		{
 			updateLeftClickRelease();
 			model = createSingleModel(tiles, floors);
+			calculateResources();
 		}
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
@@ -303,6 +345,7 @@ void Editor::updateTiles()
 		if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
 		{
 			model = createSingleModel(tiles, floors);
+			calculateResources();
 		}
 	}
 }
@@ -334,6 +377,26 @@ void Editor::updateLeftClickRelease()
 		}
 		else
 		{
+			if (IsKeyDown(KEY_LEFT_SHIFT))
+			{
+				tiles[(int)A2.y][(int)A2.x] = 0;
+				tiles[(int)B2.y][(int)B2.x] = 0;
+				tiles[(int)B2.y][(int)A2.x] = 0;
+				tiles[(int)A2.y][(int)B2.x] = 0;
+
+				for (int i = A2.x + 1; i < B2.x; i++)
+					tiles[(int)A2.y][i] = 1;
+
+				for (int i = A2.y + 1; i < B2.y; i++)
+					tiles[i][(int)A2.x] = 1;
+
+				for (int i = A2.x + 1; i < B2.x; i++)
+					tiles[(int)B2.y][i] = 1;
+
+				for (int i = A2.y + 1; i < B2.y; i++)
+					tiles[i][(int)B2.x] = 1;
+			}
+
 			len = B2.x - A.x - 1;
 			len2 = B2.y - A2.y - 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
@@ -389,6 +452,26 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 		}
 		else
 		{
+			if (IsKeyDown(KEY_LEFT_SHIFT))
+			{
+				buffer[(int)A2.y][(int)A2.x] = 0;
+				buffer[(int)B2.y][(int)B2.x] = 0;
+				buffer[(int)B2.y][(int)A2.x] = 0;
+				buffer[(int)A2.y][(int)B2.x] = 0;
+
+				for (int i = A2.x + 1; i < B2.x; i++)
+					buffer[(int)A2.y][i] = 1;
+
+				for (int i = A2.y + 1; i < B2.y; i++)
+					buffer[i][(int)A2.x] = 1;
+
+				for (int i = A2.x + 1; i < B2.x; i++)
+					buffer[(int)B2.y][i] = 1;
+
+				for (int i = A2.y + 1; i < B2.y; i++)
+					buffer[i][(int)B2.x] = 1;
+			}
+
 			len = B2.x - A.x - 1;
 			len2 = B2.y - A2.y - 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
@@ -571,20 +654,6 @@ void Editor::initTools()
 	build[2].setFunc(std::function<void()>(temp7));
 	build[2].setPos(GetScreenWidth() / 2 + 32, GetScreenHeight() - 32);
 
-	auto temp8 = [&]() { saveMenu = false; };
-	closeSave.setFunc(std::function<void()>(temp8));
-	closeSave.setPos(GetScreenWidth() / 2 - 200, GetScreenHeight() / 2 - 32);
-	closeSave.setColor({ 0, 0, 0, 200 });
-	closeSave.setSize(20, 20);
-	closeSave.setText("x");
-
-	auto temp9 = [&]() { loadMenu = false; };
-	closeLoad.setFunc(std::function<void()>(temp9));
-	closeLoad.setPos(GetScreenWidth() / 2 - 200, 100);
-	closeLoad.setColor({ 0, 0, 0, 200 });
-	closeLoad.setSize(20, 20);
-	closeLoad.setText("x");
-
 	memset(tiles, -1, sizeof(tiles));
 	memset(buffer, -1, sizeof(buffer));
 }
@@ -603,6 +672,4 @@ void Editor::initCamera()
 	cam3d.projection = CAMERA_PERSPECTIVE;
 	cam3d.target = { sizeX / 2, 10, sizeY / 2 };
 	cam3d.up = { 0, 1, 0 };
-
-	SetCameraMode(cam3d, CAMERA_FREE);
 }

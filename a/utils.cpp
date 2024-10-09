@@ -1,5 +1,68 @@
 #include "utils.h"
 
+void ImGuiStyleSetup()
+{
+    ImVec4* colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.16f, 0.15f, 0.15f, 0.94f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.12f, 0.12f, 0.12f, 0.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+    colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.33f, 0.33f, 0.33f, 0.54f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.51f, 0.51f, 0.51f, 0.64f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.54f, 0.54f, 0.54f, 0.67f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.03f, 0.04f, 0.06f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+    colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_CheckMark] = ImVec4(0.60f, 0.59f, 0.59f, 1.00f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_Button] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(0.35f, 0.35f, 0.35f, 0.31f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.51f, 0.51f, 0.51f, 0.80f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_Separator] = ImVec4(0.35f, 0.35f, 0.35f, 0.50f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.51f, 0.51f, 0.51f, 0.78f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.20f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.66f, 0.66f, 0.66f, 0.67f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.75f, 0.75f, 0.75f, 0.95f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.51f, 0.51f, 0.51f, 0.80f);
+    colors[ImGuiCol_Tab] = ImVec4(0.35f, 0.35f, 0.35f, 0.86f);
+    colors[ImGuiCol_TabSelected] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    colors[ImGuiCol_TabSelectedOverline] = ImVec4(0.58f, 0.58f, 0.58f, 1.00f);
+    colors[ImGuiCol_TabDimmed] = ImVec4(0.00f, 0.00f, 0.00f, 0.97f);
+    colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
+    colors[ImGuiCol_TabDimmedSelectedOverline] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+    colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+    colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+    colors[ImGuiCol_TableHeaderBg] = ImVec4(0.19f, 0.19f, 0.20f, 1.00f);
+    colors[ImGuiCol_TableBorderStrong] = ImVec4(0.31f, 0.31f, 0.35f, 1.00f);
+    colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
+    colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+    colors[ImGuiCol_TextLink] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+    colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+    colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+
+    ImGui::GetStyle();
+}
+
 void fillDFS(int x, int y, char oldColor, char newColor, char tiles[sizeX][sizeY])
 {
 	if (x < 0 || x >= sizeX || y < 0 || y >= sizeY || tiles[y][x] != oldColor || tiles[y][x] == newColor)
@@ -23,7 +86,7 @@ void UpdateTransform(Model& model, Vector3 pos)
 	model.transform = MatrixMultiply(rotation, translation);
 }
 
-void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector3 pos, float width, float height, float depth, Color color)
+void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector2* texcoords, Vector3 pos, float width, float height, float depth, Color color)
 {
 	Vector3 cubeVertices[] = {
 		{ pos.x, pos.y, pos.z },
@@ -51,9 +114,17 @@ void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, 
 		5, 4, 0, 0, 1, 5
 	};
 
+    Vector2 cubeTexcoords[] = {
+        { 0, height }, { width, height }, 
+        { 0, 0 }, { width, 0 },
+        { depth, height }, { height, width },
+        { 0, depth }, { width, depth }
+    };
+
 	for (int i = 0; i < 8; i++)
 	{
 		vertices[*vertexCount] = cubeVertices[i];
+        texcoords[*vertexCount] = cubeTexcoords[i];
 		colors[*vertexCount] = color;
 		(*vertexCount)++;
 	}
@@ -75,6 +146,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 	Vector3* vertices = (Vector3*)malloc(maxVertices * sizeof(Vector3));
 	Color* colors = (Color*)malloc(maxVertices * sizeof(Color));
 	unsigned short* indices = (unsigned short*)malloc(maxIndices * sizeof(unsigned short));
+    Vector2* texcoords = (Vector2*)malloc(maxIndices * sizeof(Vector2));
 
 	int vertexCount = 0;
 	int indexCount = 0;
@@ -95,7 +167,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 				height = 4.0f * (floors - 1) + 1.0f;
 				pos = { (float)j, 0, (float)i };
 
-				addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, pos, 1.0f, height, 1.0f, color);
+				addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, texcoords, pos, 1.0f, height, 1.0f, color);
 				continue;
 			case 1:
 				color = GREEN;
@@ -146,7 +218,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 
 					pos = { (float)j, yPos, (float)i };
 
-					addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, pos, width, height, length, color);
+					addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, texcoords, pos, width, height, length, color);
 				}
 			}
 		}
@@ -161,6 +233,8 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 	unsigned short** splitIndices = (unsigned short**)malloc(model.meshCount * sizeof(unsigned short*));
 	int* vertexCounts = (int*)malloc(model.meshCount * sizeof(int));
 	int* indexCounts = (int*)malloc(model.meshCount * sizeof(int));
+    Vector2** splitTexcoords = (Vector2**)malloc(model.meshCount * sizeof(Vector2*));
+
 
 	int vertexOffset = 0, indexOffset = 0;
 
@@ -176,6 +250,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 		splitVertices[i] = vertices + vertexOffset;
 		splitIndices[i] = indices + indexOffset;
 		splitColors[i] = colors + vertexOffset;
+        splitTexcoords[i] = texcoords + indexOffset;
 
 		vertexCounts[i] = currentVertexCount;
 		indexCounts[i] = currentIndexCount;
@@ -186,9 +261,9 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 
 	Mesh* meshes = (Mesh*)malloc(model.meshCount * sizeof(Mesh));
 
-	for (int i = 0; i < model.meshCount; i++)
-	{
-		Mesh mesh = { 0 };
+    for (int i = 0; i < model.meshCount; i++)
+    {
+        Mesh mesh = { 0 };
 		mesh.vertexCount = vertexCounts[i];
 		mesh.triangleCount = indexCounts[i] / 3;
 
@@ -196,6 +271,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 
 		mesh.indices = splitIndices[i];
 		mesh.colors = (unsigned char*)splitColors[i];
+        mesh.texcoords = (float*)splitTexcoords[i];
 
 		UploadMesh(&mesh, true);
 
@@ -239,54 +315,6 @@ float CAMERA_MOVE_SPEED = 0.09f;
 
 #define CAMERA_CULL_DISTANCE_NEAR      0.01
 #define CAMERA_CULL_DISTANCE_FAR    1000.0
-
-Vector3 Vector3RotateByAxisAngle(Vector3 v, Vector3 axis, float angle)
-{
-    Vector3 result = v;
-
-    // Vector3Normalize(axis);
-    float length = sqrtf(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
-    if (length == 0.0f) length = 1.0f;
-    float ilength = 1.0f / length;
-    axis.x *= ilength;
-    axis.y *= ilength;
-    axis.z *= ilength;
-
-    angle /= 2.0f;
-    float a = sinf(angle);
-    float b = axis.x * a;
-    float c = axis.y * a;
-    float d = axis.z * a;
-    a = cosf(angle);
-    Vector3 w = { b, c, d };
-
-    // Vector3CrossProduct(w, v)
-    Vector3 wv = { w.y * v.z - w.z * v.y, w.z * v.x - w.x * v.z, w.x * v.y - w.y * v.x };
-
-    // Vector3CrossProduct(w, wv)
-    Vector3 wwv = { w.y * wv.z - w.z * wv.y, w.z * wv.x - w.x * wv.z, w.x * wv.y - w.y * wv.x };
-
-    // Vector3Scale(wv, 2*a)
-    a *= 2;
-    wv.x *= a;
-    wv.y *= a;
-    wv.z *= a;
-
-    // Vector3Scale(wwv, 2)
-    wwv.x *= 2;
-    wwv.y *= 2;
-    wwv.z *= 2;
-
-    result.x += wv.x;
-    result.y += wv.y;
-    result.z += wv.z;
-
-    result.x += wwv.x;
-    result.y += wwv.y;
-    result.z += wwv.z;
-
-    return result;
-}
 
 // Move Vector towards target
 Vector3 Vector3MoveTowards(Vector3 v, Vector3 target, float maxDistance)

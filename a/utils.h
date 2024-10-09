@@ -3,16 +3,18 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "globals.h"
+#include "imgui.h"
 
 #include <iostream>
 #include <cmath>
+
+void ImGuiStyleSetup();
 
 void fillDFS(int x, int y, char oldColor, char newColor, char tiles[sizeX][sizeY]);
 
 void UpdateTransform(Model& model, Vector3 newPos);
 
-void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector3 pos, float width, float height, float depth, Color color);
-
+void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector2* texcoords, Vector3 pos, float width, float height, float depth, Color color);
 Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos = { 0 });
 
 Vector3 Vector3MoveTowards(Vector3 v, Vector3 target, float maxDistance);
