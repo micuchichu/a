@@ -149,15 +149,12 @@ void Editor::drawTile(char type, int x, int y)
 
 void Editor::drawSaveMenu()
 {
-	int flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove;
+	bool p_open = true;
+	int flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 
 	ImGui::SetNextWindowPos({ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f }, ImGuiCond_Always, { 0, 0 });
 
-	//ImGui::Begin("Save", &p_open, flags);
-	ImGui::BeginPopup("niga", flags);
-
-	if (closeSave = ImGui::SmallButton("x"))
-		ImGui::CloseCurrentPopup();
+	ImGui::Begin("Save", &closeSave, flags);
 	ImGui::InputText("", buf, 32);
 	ImGui::SameLine();
 	closeSave = ImGui::SmallButton("Save");
