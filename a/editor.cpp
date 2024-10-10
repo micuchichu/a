@@ -25,14 +25,8 @@ void Editor::Draw()
 	if (len2 > 0)
 		DrawText(TextFormat("%d", len2), GetMouseX(), GetMouseY() + 25, 20, BLACK);
 
-	if (saveMenu)
-	{
-		drawSaveMenu();
-	}
-	else if (loadMenu)
-	{
-		drawLoadMenu();
-	}
+	drawSaveMenu();
+	drawLoadMenu();
 
 	for (int i = 0; i < 4; i++)
 		tools[i].DrawButton();
@@ -67,14 +61,6 @@ void Editor::Update()
 
 		floors += IsKeyPressed(KEY_UP);
 		floors -= IsKeyPressed(KEY_DOWN) * (floors > 1);
-	}
-	else if (loadMenu)
-	{
-		updateLoadMenu();
-	}
-	else if (saveMenu)
-	{
-		updateSaveMenu();
 	}
 
 	updateModel();
@@ -149,17 +135,39 @@ void Editor::drawTile(char type, int x, int y)
 
 void Editor::drawSaveMenu()
 {
-	bool p_open = true;
-	int flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
+	bool p_open = saveMenu;
 
-	ImGui::SetNextWindowPos({ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f }, ImGuiCond_Always, { 0, 0 });
+	if (p_open)
+	{
+		int flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 
-	ImGui::Begin("Save", &closeSave, flags);
-	ImGui::InputText("", buf, 32);
-	ImGui::SameLine();
-	closeSave = ImGui::SmallButton("Save");
+		ImGui::SetNextWindowPos({ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f }, ImGuiCond_Appearing, { 0, 0 });
 
-	ImGui::EndPopup();
+		if (ImGui::Begin("Save", &p_open, flags))
+		{
+			ImGui::InputText("", buf, 32);
+			ImGui::SameLine();
+			if (ImGui::SmallButton("Save"))
+			{
+				std::string saveName = ("./saves/");
+				saveName += buf;
+				saveName += ".txt";
+				std::ofstream save(saveName);
+				for (int i = 0; i < sizeY; i++)
+					for (int j = 0; j < sizeX; j++)
+						save << tiles[i][j] << " ";
+
+				save << floors;
+
+				p_open = false;
+			}
+		}
+
+		ImGui::End();
+
+		saveMenu = p_open;
+	}
+
 	// OLD UI:
 	//DrawRectangle(GetScreenWidth() / 2 - 200, GetScreenHeight() / 2 - 32, 400, 60, { 0, 0, 0, 200 });
 	//DrawText("Save name:", GetScreenWidth() / 2 - 190, GetScreenHeight() / 2 - 30, 30, WHITE);
@@ -169,9 +177,43 @@ void Editor::drawSaveMenu()
 
 void Editor::drawLoadMenu()
 {
+	bool p_open = loadMenu;
+
+	if (p_open)
+	{
+		int flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
+
+		ImGui::SetNextWindowPos({ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f - 100 }, ImGuiCond_Appearing, { 0, 0 });
+
+		if (ImGui::Begin("Load", &p_open, flags))
+		{
+			ImGui::BeginTable("Files", 1);
+			for (int i = 0; i < saves.size(); i++)
+			{
+				ImGui::TableNextColumn();
+				ImGui::Separator();
+				if (ImGui::Selectable(saves[i].c_str()))
+				{
+					std::ifstream load(saves[i]);
+					for (int j = 0; j < sizeY; j++)
+						for (int k = 0; k < sizeX; k++)
+							load >> tiles[j][k];
+
+					if (!load.eof())
+						load >> floors;
+				}
+			}
+			ImGui::EndTable();
+		}
+
+		ImGui::End();
+
+		loadMenu = p_open;
+	}
+
+	// OLD UI:
 	//DrawRectangle(GetScreenWidth() / 2 - 200, 100, 400, GetScreenHeight() - 100, { 0, 0, 0, 200 });
 	//DrawText("Pick a save to load", GetScreenWidth() / 2 - 190, 110, 30, WHITE);
-
 	//for (int i = 0; i < saves.size(); i++)
 	//{
 	//	DrawText(saves[i].c_str(), GetScreenWidth() / 2 - 190, 150 + i * 20, 20, WHITE);
@@ -229,86 +271,88 @@ void Editor::updateModel()
 	EndTextureMode();
 }
 
-void Editor::updateSaveMenu()
-{
-	if (closeSave)
-		ImGui::CloseCurrentPopup();
-
-	/*char n = GetCharPressed();
-
-	if (IsKeyPressed(KEY_BACKSPACE) && saveName.size() > 0)
-	{
-		saveName.pop_back();
-	}
-	else if (IsKeyPressed(KEY_ENTER))
-	{
-		saveMenu = false;
-		std::ofstream save("./saves/" + saveName + ".txt");
-
-		for (int i = 0; i < sizeY; i++)
-		{
-			for (int j = 0; j < sizeX; j++)
-			{
-				save << tiles[i][j] << " "; 
-			}
-		}
-		save << floors;
-
-		saveName.clear();
-	}
-	else if (n)
-	{
-		saveName.push_back(n);
-	}
-
-	closeSave.Clicked();*/
-}
-
-void Editor::updateLoadMenu()
-{
-	//if (IsKeyPressed(KEY_DOWN))
-	//{
-	//	if (currentSave < saves.size() - 1)
-	//		currentSave++;
-	//}
-	//else if (IsKeyPressed(KEY_UP))
-	//{
-	//	if (currentSave > 0)
-	//		currentSave--;
-	//}
-	//else if (IsKeyPressed(KEY_ENTER))
-	//{
-	//	loadMenu = false;
-
-	//	if (saves.size())
-	//	{
-	//		std::ifstream load(saves[currentSave]);
-
-	//		for (int i = 0; i < sizeY; i++)
-	//		{
-	//			for (int j = 0; j < sizeX; j++)
-	//			{
-	//				load >> tiles[i][j];
-	//			}
-	//		}
-	//		if (!load.eof())
-	//			load >> floors;
-	//	}
-	//	
-	//	model = createSingleModel(tiles, floors);
-	//}
-	//else if (IsKeyPressed(KEY_DELETE))
-	//{
-	//	std::remove(saves[currentSave].c_str());
-	//	
-	//	loadSaves();
-	//	
-	//	if(currentSave > 0)
-	//		currentSave--;
-	//}
-	//
-	//closeLoad.Clicked();
-}
+//void Editor::updateSaveMenu()
+//{
+//	// OLD UI LOGIC:
+//	/*char n = GetCharPressed();
+//
+//	if (IsKeyPressed(KEY_BACKSPACE) && saveName.size() > 0)
+//	{
+//		saveName.pop_back();
+//	}
+//	else if (IsKeyPressed(KEY_ENTER))
+//	{
+//		saveMenu = false;
+//		std::ofstream save("./saves/" + saveName + ".txt");
+//
+//		for (int i = 0; i < sizeY; i++)
+//		{
+//			for (int j = 0; j < sizeX; j++)
+//			{
+//				save << tiles[i][j] << " "; 
+//			}
+//		}
+//		save << floors;
+//
+//		saveName.clear();
+//	}
+//	else if (n)
+//	{
+//		saveName.push_back(n);
+//	}
+//
+//	closeSave.Clicked();*/
+//}
+//
+//void Editor::updateLoadMenu()
+//{
+//	if (loadMenu)
+//	{
+//
+//	}
+//
+//	// OLD UI LOGIC:
+//	//if (IsKeyPressed(KEY_DOWN))
+//	//{
+//	//	if (currentSave < saves.size() - 1)
+//	//		currentSave++;
+//	//}
+//	//else if (IsKeyPressed(KEY_UP))
+//	//{
+//	//	if (currentSave > 0)
+//	//		currentSave--;
+//	//}
+//	//else if (IsKeyPressed(KEY_ENTER))
+//	//{
+//	//	loadMenu = false;
+//	//	if (saves.size())
+//	//	{
+//	//		std::ifstream load(saves[currentSave]);
+//	//		for (int i = 0; i < sizeY; i++)
+//	//		{
+//	//			for (int j = 0; j < sizeX; j++)
+//	//			{
+//	//				load >> tiles[i][j];
+//	//			}
+//	//		}
+//	//		if (!load.eof())
+//	//			load >> floors;
+//	//	}
+//	//	
+//	//	model = createSingleModel(tiles, floors);
+//	//}
+//	//else if (IsKeyPressed(KEY_DELETE))
+//	//{
+//	//	std::remove(saves[currentSave].c_str());
+//	//	
+//	//	loadSaves();
+//	//	
+//	//	if(currentSave > 0)
+//	//		currentSave--;
+//	//}
+//	//
+//	//closeLoad.Clicked();
+//}
 
 void Editor::updateTiles()
 {

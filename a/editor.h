@@ -49,8 +49,8 @@ private:
 	void onWindowResize();
 
 	void updateModel();
-	void updateSaveMenu();
-	void updateLoadMenu();
+	//void updateSaveMenu();
+	//void updateLoadMenu();
 
 	void updateTiles();
 
@@ -82,9 +82,6 @@ private:
 	// save/load related
 	std::vector<std::string> saves;
 	char buf[32];
-	std::string saveName;
-	bool closeSave;
-	bool closeLoad;
 
 	int currentSave = 0;
 
