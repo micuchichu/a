@@ -44,6 +44,7 @@ private:
 	void drawSaveMenu();
 	void drawLoadMenu();
 	void drawTiles();
+	void drawModel();
 
 	// Update functions
 	void onWindowResize();

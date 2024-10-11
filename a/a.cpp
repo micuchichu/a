@@ -35,17 +35,32 @@ int main()
 		for (int i = 0; i < SCENE_COUNT; i++)
 			scenes[i]->BackgroundUpdates();
 
-		if (IsKeyPressed('N'))
-		{
-			menu++;
-			scenes[menu]->OnSwitch();
-		}
-
-		if (menu > SCENE_COUNT - 1) menu = 0;
+		//if (IsKeyPressed('N'))
+		//{
+		//	//menu++;
+		//	scenes[menu]->OnSwitch();
+		//}
+		//if (menu > SCENE_COUNT - 1) menu = 0;
 
 		BeginDrawing();
 		ClearBackground(WHITE);
 		rlImGuiBegin();
+
+		ImGui::BeginMainMenuBar();
+
+		if (ImGui::MenuItem("Editor")) 
+		{ 
+			menu = EDITOR;
+			scenes[menu]->OnSwitch();
+		}
+
+		if (ImGui::MenuItem("Planner"))
+		{
+			menu = PLANNER;
+			scenes[menu]->OnSwitch();
+		}
+
+		ImGui::EndMainMenuBar();
 
 		//ImGui::ShowDemoWindow();
 		scenes[menu]->Draw();

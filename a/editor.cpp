@@ -12,11 +12,11 @@ void Editor::Draw()
 {
 	//DrawTexturePro(view3D.texture, { 0, 0, (float)view3D.texture.width, -(float)view3D.texture.height }, { GetScreenWidth() * 0.5f - 100, 0, (float)view3D.texture.width, (float)view3D.texture.height }, { 0, 0 }, 0, WHITE);
 
-	rlImGuiImageRenderTexture(&view3D);
-
 	BeginMode2D(cam);
 
 	drawTiles();
+	
+	drawModel();
 
 	EndMode2D();
 
@@ -93,7 +93,7 @@ void Editor::drawTotals(int x, int y)
 	bool p_open = true;
 	int flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 	
-	ImGui::SetNextWindowPos({ 10, 10 }, ImGuiCond_Always, {0, 0});
+	ImGui::SetNextWindowPos({ 1, 20 }, ImGuiCond_Always, {0, 0});
 	
 	ImGui::Begin("Resources", &p_open, flags);
 	
@@ -232,6 +232,23 @@ void Editor::drawTiles()
 			drawTile(buffer[i][j], i * tileSize, j * tileSize);
 		}
 	}
+}
+
+void Editor::drawModel()
+{
+	bool p_open = true;
+	int flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
+
+	ImGui::SetNextWindowPos({ (sizeX + 15.0f) * tileSize, 20}, ImGuiCond_Appearing, {0, 0});
+
+	if (ImGui::Begin("Render", &p_open, flags)) 
+	{
+		//ImGui::SetWindowPos(
+		//	ImVec2((sizeX + 10.0f) * tileSize, 0),
+		//	true);
+		rlImGuiImageRenderTexture(&view3D);
+	}
+	ImGui::End();
 }
 
 // Update functions
