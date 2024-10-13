@@ -16,6 +16,9 @@
     <Filter Include="libs">
       <UniqueIdentifier>{fd76ffc0-1f18-4991-bc54-d6df9023568f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shaders">
+      <UniqueIdentifier>{157a410f-205f-4c2f-ab88-f16fd6abbe97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="a.cpp">
@@ -77,5 +80,9 @@
     <ClInclude Include="resourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment.fs" />
+    <None Include="vertex.vs" />
   </ItemGroup>
 </Project>

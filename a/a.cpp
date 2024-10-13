@@ -22,6 +22,8 @@ int main()
 
 	ImGuiStyleSetup();
 
+	LoadTextures();
+
 	Scene* scenes[SCENE_COUNT];
 	scenes[0] = new Editor;
 	scenes[1] = new Planner;

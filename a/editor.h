@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "rlImGui.h"
 
+#include "resourceManager.h"
 #include "utils.h"
 #include "globals.h"
 #include "gui.h"
@@ -16,10 +17,10 @@
 
 enum Tools
 {
-	PIXEL,
-	LINE,
-	FILL,
-	MULTI,
+	TPIXEL,
+	TLINE,
+	TFILL,
+	TMULTI,
 };
 
 class Editor : public Scene
@@ -75,10 +76,10 @@ private:
 	// Tools related
 	Vector2 A, B;
 
-	char tool = Tools::MULTI;
-	Button tools[4];
-	Button build[3];
+	char tool = Tools::TMULTI;
 	int len, len2;
+
+	std::vector<int> textures;
 
 	// save/load related
 	std::vector<std::string> saves;
@@ -100,6 +101,10 @@ private:
 	Model model = { 0 };
 
 	RenderTexture2D view3D;
+
+	ResourceManager* resources;
+
+	Shader shader;
 
 	Camera2D cam;
 	Camera cam3d;

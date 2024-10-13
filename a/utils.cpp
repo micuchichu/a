@@ -86,54 +86,63 @@ void UpdateTransform(Model& model, Vector3 pos)
 	model.transform = MatrixMultiply(rotation, translation);
 }
 
-void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector2* texcoords, Vector3 pos, float width, float height, float depth, Color color)
+void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector2* texcoords, Vector3* normals, Vector3 pos, float width, float height, float depth, Color color)
 {
-	Vector3 cubeVertices[] = {
-		{ pos.x, pos.y, pos.z },
-		{ pos.x + width, pos.y, pos.z },
-		{ pos.x, pos.y + height, pos.z },
-		{ pos.x + width, pos.y + height, pos.z },
-		{ pos.x, pos.y, pos.z + depth },
-		{ pos.x + width, pos.y, pos.z + depth },
-		{ pos.x, pos.y + height, pos.z + depth },
-		{ pos.x + width, pos.y + height, pos.z + depth}
-	};
+    Vector3 cubeVertices[] = {
+        { pos.x, pos.y, pos.z },
+        { pos.x + width, pos.y, pos.z },
+        { pos.x, pos.y + height, pos.z },
+        { pos.x + width, pos.y + height, pos.z },
+        { pos.x, pos.y, pos.z + depth },
+        { pos.x + width, pos.y, pos.z + depth },
+        { pos.x, pos.y + height, pos.z + depth },
+        { pos.x + width, pos.y + height, pos.z + depth}
+    };
 
-	unsigned short cubeIndices[36] = {
-		// Front face
-		2, 1, 0, 2, 3, 1,
-		// Right face
-		7, 5, 1, 1, 3, 7,
-		// Back face
-		6, 4, 5, 5, 7, 6,
-		// Left face
-		2, 0, 4, 4, 6, 2,
-		// Top face
-		2, 6, 7, 7, 3, 2,
-		// Bottom face
-		5, 4, 0, 0, 1, 5
-	};
+    Vector3 cubeNormals[] = {
+        { 0.0f, 0.0f, -1.0f },  // Front face
+        { 1.0f, 0.0f, 0.0f },   // Right face
+        { 0.0f, 0.0f, 1.0f },   // Back face
+        { -1.0f, 0.0f, 0.0f },  // Left face
+        { 0.0f, 1.0f, 0.0f },   // Top face
+        { 0.0f, -1.0f, 0.0f }   // Bottom face
+    };
+
+    unsigned short cubeIndices[36] = {
+        // Front face
+        2, 1, 0, 2, 3, 1,
+        // Right face
+        7, 5, 1, 1, 3, 7,
+        // Back face
+        6, 4, 5, 5, 7, 6,
+        // Left face
+        2, 0, 4, 4, 6, 2,
+        // Top face
+        2, 6, 7, 7, 3, 2,
+        // Bottom face
+        5, 4, 0, 0, 1, 5
+    };
 
     Vector2 cubeTexcoords[] = {
-        { 0, height }, { width, height }, 
+        { 0, height }, { width, height },
         { 0, 0 }, { width, 0 },
         { depth, height }, { height, width },
         { 0, depth }, { width, depth }
     };
 
-	for (int i = 0; i < 8; i++)
-	{
-		vertices[*vertexCount] = cubeVertices[i];
+    for (int i = 0; i < 8; i++)
+    {
+        vertices[*vertexCount] = cubeVertices[i];
         texcoords[*vertexCount] = cubeTexcoords[i];
-		colors[*vertexCount] = color;
-		(*vertexCount)++;
-	}
+        colors[*vertexCount] = color;
+        normals[*vertexCount] = cubeNormals[i];
+        (*vertexCount)++;
+    }
 
-	for (int i = 0; i < 36; i++)
-	{
-		indices[*indexCount] = cubeIndices[i] + (*vertexCount) - 8;
-		(*indexCount)++;
-	}
+    for (int i = 0; i < 36; i++) {
+        indices[*indexCount] = cubeIndices[i] + (*vertexCount) - 8;
+        (*indexCount)++;
+    }
 }
 
 Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
@@ -147,6 +156,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 	Color* colors = (Color*)malloc(maxVertices * sizeof(Color));
 	unsigned short* indices = (unsigned short*)malloc(maxIndices * sizeof(unsigned short));
     Vector2* texcoords = (Vector2*)malloc(maxIndices * sizeof(Vector2));
+    Vector3* normals = (Vector3*)malloc(maxVertices * sizeof(Vector3));
 
 	int vertexCount = 0;
 	int indexCount = 0;
@@ -167,14 +177,14 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 				height = 4.0f * (floors - 1) + 1.0f;
 				pos = { (float)j, 0, (float)i };
 
-				addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, texcoords, pos, 1.0f, height, 1.0f, color);
+				addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, texcoords, normals, pos, 1.0f, height, 1.0f, color);
 				continue;
 			case 1:
 				color = GREEN;
 				height = 1.0f;
 				break;
 			case 2:
-				color = BLUE;
+                color = BLUE;
 				height = 0.5f;
 				break;
 			default:
@@ -218,7 +228,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 
 					pos = { (float)j, yPos, (float)i };
 
-					addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, texcoords, pos, width, height, length, color);
+					addCubeVertices(vertices, colors, indices, &vertexCount, &indexCount, texcoords, normals, pos, width, height, length, color);
 				}
 			}
 		}
@@ -231,10 +241,11 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 	Vector3** splitVertices = (Vector3**)malloc(model.meshCount * sizeof(Vector3*));
 	Color** splitColors = (Color**)malloc(model.meshCount * sizeof(Color*));
 	unsigned short** splitIndices = (unsigned short**)malloc(model.meshCount * sizeof(unsigned short*));
+    Vector3** splitNormals = (Vector3**)malloc(model.meshCount * sizeof(Vector3*));
+
 	int* vertexCounts = (int*)malloc(model.meshCount * sizeof(int));
 	int* indexCounts = (int*)malloc(model.meshCount * sizeof(int));
     Vector2** splitTexcoords = (Vector2**)malloc(model.meshCount * sizeof(Vector2*));
-
 
 	int vertexOffset = 0, indexOffset = 0;
 
@@ -251,6 +262,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 		splitIndices[i] = indices + indexOffset;
 		splitColors[i] = colors + vertexOffset;
         splitTexcoords[i] = texcoords + indexOffset;
+        splitNormals[i] = normals + vertexOffset;
 
 		vertexCounts[i] = currentVertexCount;
 		indexCounts[i] = currentIndexCount;
@@ -272,6 +284,7 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 		mesh.indices = splitIndices[i];
 		mesh.colors = (unsigned char*)splitColors[i];
         mesh.texcoords = (float*)splitTexcoords[i];
+        mesh.normals = (float*)splitNormals[i];
 
 		UploadMesh(&mesh, true);
 
@@ -293,6 +306,9 @@ Model createSingleModel(char tiles[sizeY][sizeX], int floors, Vector3 pos)
 
 	free(colors);
 	free(splitColors);
+
+    free(normals);
+    free(splitNormals);
 
 	return model;
 }

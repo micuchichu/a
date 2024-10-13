@@ -2,19 +2,26 @@
 
 Editor::Editor()
 {
+	resources = ResourceManager::GetInstance();
+	shader = LoadShader("vertex.vs", 0);
+
 	initCamera();
 	initTools();
 	bloc = LoadMaterialDefault();
-	bloc.maps[MATERIAL_MAP_DIFFUSE].texture = build[1].getTexture();
+	bloc.maps[MATERIAL_MAP_DIFFUSE].texture = resources->GetTexture(Textures::PILLAR);
+	//bloc.shader = shader;
 }
 
 void Editor::Draw()
 {
-	//DrawTexturePro(view3D.texture, { 0, 0, (float)view3D.texture.width, -(float)view3D.texture.height }, { GetScreenWidth() * 0.5f - 100, 0, (float)view3D.texture.width, (float)view3D.texture.height }, { 0, 0 }, 0, WHITE);
+	BeginShaderMode(shader);
+	DrawTexturePro(view3D.texture, { 0, 0, (float)view3D.texture.width, -(float)view3D.texture.height }, { GetScreenWidth() * 0.5f - 100, 0, (float)view3D.texture.width, (float)view3D.texture.height }, { 0, 0 }, 0, WHITE);
+	EndShaderMode();
 
 	BeginMode2D(cam);
 
 	drawTiles();
+
 	drawModel();
 
 	EndMode2D();
@@ -29,19 +36,15 @@ void Editor::Draw()
 
 	if (ImGui::Begin("Tools"))
 	{
-		if (ImGui::Button("Multitool")) tool = Tools::MULTI;
-		if (ImGui::Button("Pencil")) tool = Tools::PIXEL;
-		if (ImGui::Button("Line")) tool = Tools::LINE;
-		if (ImGui::Button("Bucket")) tool = Tools::FILL;
+		if (ImGui::Button("Multitool")) tool = Tools::TMULTI;
+		if (ImGui::Button("Pencil")) tool = Tools::TPIXEL;
+		if (ImGui::Button("Line")) tool = Tools::TLINE;
+		if (ImGui::Button("Bucket")) tool = Tools::TFILL;
+
+		ImGui::Text("Current Tool: %d", tool);
 	}
 
 	ImGui::End();
-
-	for (int i = 0; i < 4; i++)
-		tools[i].DrawButton();
-
-	for (int i = 0; i < 3; i++)
-		build[i].DrawButton(0.2f);
 
 	drawTotals(0, 0);
 
@@ -57,12 +60,6 @@ void Editor::Update()
 	UpdateCameraNew(&cam3d, CAMERA_ORBITAL);
 	
 	updateTiles();
-
-	for (int i = 0; i < 4; i++)
-		tools[i].Clicked();
-
-	for (int i = 0; i < 3; i++)
-		build[i].Clicked();
 
 	if (!saveMenu && !loadMenu)
 	{
@@ -255,9 +252,6 @@ void Editor::drawModel()
 
 	if (ImGui::Begin("Render", &p_open, flags)) 
 	{
-		//ImGui::SetWindowPos(
-		//	ImVec2((sizeX + 10.0f) * tileSize, 0),
-		//	true);
 		rlImGuiImageRenderTexture(&view3D);
 	}
 	ImGui::End();
@@ -267,19 +261,7 @@ void Editor::drawModel()
 
 void Editor::onWindowResize()
 {
-	tools[0].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 - 45);
-	tools[1].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 - 15);
-	tools[2].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 + 15);
-	tools[3].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 + 45);
-
-	build[0].setPos(GetScreenWidth() / 2 - 32, GetScreenHeight() - 32);
-	build[1].setPos(GetScreenWidth() / 2, GetScreenHeight() - 32);
-	build[2].setPos(GetScreenWidth() / 2 + 32, GetScreenHeight() - 32);
-
-	//closeSave.setPos(GetScreenWidth() / 2 + 180, GetScreenHeight() / 2 - 32);
-	//closeLoad.setPos(GetScreenWidth() / 2 + 180, 100);
-
-	view3D = LoadRenderTexture(GetScreenWidth() / 2 + 100, GetScreenHeight());
+	view3D = LoadRenderTexture(GetScreenWidth() / 2 + 100, ImGui::GetMainViewport()->Size.y);
 }
 
 void Editor::updateModel()
@@ -289,11 +271,15 @@ void Editor::updateModel()
 
 	BeginMode3D(cam3d);
 
+	BeginShaderMode(shader);
+
 	for (int i = 0; i < model.meshCount; i++)
 		DrawMesh(model.meshes[i], bloc, model.transform);
 	//DrawModel(model, { 0, 0, 0 }, 1, WHITE);
 
 	//DrawModelWires(model, {0, 0, 0}, 1, BLACK);
+
+	EndShaderMode();
 
 	EndMode3D();
 
@@ -348,7 +334,7 @@ void Editor::updateLeftClickRelease()
 	if (A2.y > B2.y)
 		std::swap(A2.y, B2.y);
 
-	if (tool == Tools::MULTI)
+	if (tool == Tools::TMULTI)
 	{
 		if (A.x == B.x)
 		{
@@ -392,7 +378,7 @@ void Editor::updateLeftClickRelease()
 		}
 
 	}
-	else if (tool == Tools::LINE)
+	else if (tool == Tools::TLINE)
 	{
 		if (A.x == B.x)
 		{
@@ -423,7 +409,7 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 	if (A2.y > B2.y)
 		std::swap(A2.y, B2.y);
 
-	if (tool == Tools::MULTI)
+	if (tool == Tools::TMULTI)
 	{
 		if (A.x == B.x)
 		{
@@ -467,7 +453,7 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 		}
 
 	}
-	else if (tool == Tools::LINE)
+	else if (tool == Tools::TLINE)
 	{
 		if (A.x == B.x)
 		{
@@ -495,15 +481,15 @@ void Editor::updateLeftClickPressed(Vector2& mouse)
 		tiles[y][x] = selected;
 		break;
 
-	case Tools::LINE:
+	case Tools::TLINE:
 		A = { (float)x, (float)y };
 		break;
 
-	case Tools::FILL:
+	case Tools::TFILL:
 		fillDFS(x, y, tiles[y][x], selected, tiles);
 		break;
 
-	case Tools::MULTI:
+	case Tools::TMULTI:
 		tiles[y][x] = selected;
 		A = { (float)x, (float)y };
 		break;
@@ -548,16 +534,16 @@ void Editor::updateTools()
 	switch (GetKeyPressed())
 	{
 	case '1':
-		tool = Tools::PIXEL;
+		tool = Tools::TPIXEL;
 		break;
 	case '2':
-		tool = Tools::LINE;
+		tool = Tools::TLINE;
 		break;
 	case '3':
-		tool = Tools::FILL;
+		tool = Tools::TFILL;
 		break;
 	case '4':
-		tool = Tools::MULTI;
+		tool = Tools::TMULTI;
 		break;
 	}
 
@@ -609,38 +595,6 @@ void Editor::loadSaves()
 
 void Editor::initTools()
 {
-	tools[0] = LoadTexture("textures/pixel.png");
-	tools[1] = LoadTexture("textures/line.png");
-	tools[2] = LoadTexture("textures/bucket.png");
-	tools[3] = LoadTexture("textures/multitool.png");
-
-	build[0] = LoadTexture("textures/pillar.png");
-	build[1] = LoadTexture("textures/wall.png");
-	build[2] = LoadTexture("textures/slab.png");
-
-	auto temp1 = [&]() { tool = 0; };
-	tools[0].setFunc(std::function<void()>(temp1));
-	tools[0].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 - 45);
-	auto temp2 = [&]() { tool = 1; };
-	tools[1].setFunc(std::function<void()>(temp2));
-	tools[1].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 - 15);
-	auto temp3 = [&]() { tool = 2; };
-	tools[2].setFunc(std::function<void()>(temp3));
-	tools[2].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 + 15);
-	auto temp4 = [&]() { tool = 3; };
-	tools[3].setFunc(std::function<void()>(temp4));
-	tools[3].setPos(GetScreenWidth() - 30, GetScreenHeight() / 2 + 45);
-
-	auto temp5 = [&]() { selected = 0; };
-	build[0].setFunc(std::function<void()>(temp5));
-	build[0].setPos(GetScreenWidth() / 2 - 32, GetScreenHeight() - 32);
-	auto temp6 = [&]() { selected = 1; };
-	build[1].setFunc(std::function<void()>(temp6));
-	build[1].setPos(GetScreenWidth() / 2, GetScreenHeight() - 32);
-	auto temp7 = [&]() { selected = 2; };
-	build[2].setFunc(std::function<void()>(temp7));
-	build[2].setPos(GetScreenWidth() / 2 + 32, GetScreenHeight() - 32);
-
 	memset(tiles, -1, sizeof(tiles));
 	memset(buffer, -1, sizeof(buffer));
 }

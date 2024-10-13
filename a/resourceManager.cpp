@@ -1,37 +1,65 @@
 #include "resourceManager.h"
 
+ResourceManager* ResourceManager::_resources = nullptr;
+
 ResourceManager* ResourceManager::GetInstance()
 {
-	if (resources == nullptr)
-		resources = new ResourceManager();
+	if (_resources == nullptr)
+		_resources = new ResourceManager();
 
-	return ResourceManager::resources;
+	return ResourceManager::_resources;
 }
 
-uint32_t ResourceManager::AddTexture(std::string path)
+// Setters
+
+uint32_t ResourceManager::ResLoadTexture(std::string path)
 {
 	textures[textureIds] = LoadTexture(path.c_str());
+	textureIds++;
+	std::cout << textureIds << std::endl;
+	return textureIds - 1;
+}
+
+uint32_t ResourceManager::AddTexture(Texture2D& texture)
+{
+	textures[textureIds] = texture;
 	textureIds++;
 	return textureIds - 1;
 }
 
-uint32_t ResourceManager::LoadModel(Model& model)
+uint32_t ResourceManager::AddRenderTexture(RenderTexture& renderTexture)
+{
+	renderTextures[renderTextureIds] = renderTexture;
+	renderTextureIds++;
+	return renderTextureIds - 1;
+}
+
+uint32_t ResourceManager::AddModel(Model& model)
 {
 	models[modelIds] = model;
 	modelIds++;
 	return modelIds - 1;
 }
 
-Texture2D* ResourceManager::GetTexture(uint32_t id)
+// Getters
+
+Texture2D ResourceManager::GetTexture(uint32_t id)
 {
-	if(textureIds < id)
-		return &textures[id];
-	return nullptr;
+	if(id < textureIds)
+		return textures[id];
+	return { 0 };
 }
 
-Model* ResourceManager::GetModel(uint32_t id)
+RenderTexture ResourceManager::GetRenderTexture(uint32_t id)
 {
-	if (modelIds < id)
-		return &models[id];
-	return nullptr;
+	if (id < renderTextureIds)
+		return renderTextures[id];
+	return { 0 };
+}
+
+Model ResourceManager::GetModel(uint32_t id)
+{
+	if (id < modelIds)
+		return models[id];
+	return { 0 };
 }
