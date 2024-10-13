@@ -15,7 +15,6 @@ void Editor::Draw()
 	BeginMode2D(cam);
 
 	drawTiles();
-	
 	drawModel();
 
 	EndMode2D();
@@ -27,6 +26,16 @@ void Editor::Draw()
 
 	drawSaveMenu();
 	drawLoadMenu();
+
+	if (ImGui::Begin("Tools"))
+	{
+		if (ImGui::Button("Multitool")) tool = Tools::MULTI;
+		if (ImGui::Button("Pencil")) tool = Tools::PIXEL;
+		if (ImGui::Button("Line")) tool = Tools::LINE;
+		if (ImGui::Button("Bucket")) tool = Tools::FILL;
+	}
+
+	ImGui::End();
 
 	for (int i = 0; i < 4; i++)
 		tools[i].DrawButton();
@@ -239,7 +248,10 @@ void Editor::drawModel()
 	bool p_open = true;
 	int flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove;
 
-	ImGui::SetNextWindowPos({ (sizeX + 15.0f) * tileSize, 20}, ImGuiCond_Appearing, {0, 0});
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImVec2 pos = viewport->WorkPos;
+
+	ImGui::SetNextWindowPos({ (float)GetScreenWidth(), pos.y}, ImGuiCond_Always, {1, 0});
 
 	if (ImGui::Begin("Render", &p_open, flags)) 
 	{
@@ -287,89 +299,6 @@ void Editor::updateModel()
 
 	EndTextureMode();
 }
-
-//void Editor::updateSaveMenu()
-//{
-//	// OLD UI LOGIC:
-//	/*char n = GetCharPressed();
-//
-//	if (IsKeyPressed(KEY_BACKSPACE) && saveName.size() > 0)
-//	{
-//		saveName.pop_back();
-//	}
-//	else if (IsKeyPressed(KEY_ENTER))
-//	{
-//		saveMenu = false;
-//		std::ofstream save("./saves/" + saveName + ".txt");
-//
-//		for (int i = 0; i < sizeY; i++)
-//		{
-//			for (int j = 0; j < sizeX; j++)
-//			{
-//				save << tiles[i][j] << " "; 
-//			}
-//		}
-//		save << floors;
-//
-//		saveName.clear();
-//	}
-//	else if (n)
-//	{
-//		saveName.push_back(n);
-//	}
-//
-//	closeSave.Clicked();*/
-//}
-//
-//void Editor::updateLoadMenu()
-//{
-//	if (loadMenu)
-//	{
-//
-//	}
-//
-//	// OLD UI LOGIC:
-//	//if (IsKeyPressed(KEY_DOWN))
-//	//{
-//	//	if (currentSave < saves.size() - 1)
-//	//		currentSave++;
-//	//}
-//	//else if (IsKeyPressed(KEY_UP))
-//	//{
-//	//	if (currentSave > 0)
-//	//		currentSave--;
-//	//}
-//	//else if (IsKeyPressed(KEY_ENTER))
-//	//{
-//	//	loadMenu = false;
-//	//	if (saves.size())
-//	//	{
-//	//		std::ifstream load(saves[currentSave]);
-//	//		for (int i = 0; i < sizeY; i++)
-//	//		{
-//	//			for (int j = 0; j < sizeX; j++)
-//	//			{
-//	//				load >> tiles[i][j];
-//	//			}
-//	//		}
-//	//		if (!load.eof())
-//	//			load >> floors;
-//	//	}
-//	//	
-//	//	model = createSingleModel(tiles, floors);
-//	//}
-//	//else if (IsKeyPressed(KEY_DELETE))
-//	//{
-//	//	std::remove(saves[currentSave].c_str());
-//	//	
-//	//	loadSaves();
-//	//	
-//	//	if(currentSave > 0)
-//	//		currentSave--;
-//	//}
-//	//
-//	//closeLoad.Clicked();
-//}
 
 void Editor::updateTiles()
 {
@@ -570,7 +499,7 @@ void Editor::updateLeftClickPressed(Vector2& mouse)
 		A = { (float)x, (float)y };
 		break;
 
-	case Tools::BUCKET:
+	case Tools::FILL:
 		fillDFS(x, y, tiles[y][x], selected, tiles);
 		break;
 
@@ -625,7 +554,7 @@ void Editor::updateTools()
 		tool = Tools::LINE;
 		break;
 	case '3':
-		tool = Tools::BUCKET;
+		tool = Tools::FILL;
 		break;
 	case '4':
 		tool = Tools::MULTI;

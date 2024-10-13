@@ -148,6 +148,7 @@
     <ClCompile Include="libs\rlImGui.cpp" />
     <ClCompile Include="planner.cpp" />
     <ClCompile Include="gui.cpp" />
+    <ClCompile Include="resourceManager.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
@@ -155,6 +156,7 @@
     <ClInclude Include="editor.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="planner.h" />
+    <ClInclude Include="resourceManager.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>

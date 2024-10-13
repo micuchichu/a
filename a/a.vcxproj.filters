@@ -54,6 +54,9 @@
     <ClCompile Include="libs\rlImGui.cpp">
       <Filter>libs</Filter>
     </ClCompile>
+    <ClCompile Include="resourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

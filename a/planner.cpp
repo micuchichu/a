@@ -46,8 +46,8 @@ void Planner::BackgroundUpdates()
 
 void Planner::OnSwitch()
 {
-	HideCursor();
-	DisableCursor();
+	//HideCursor();
+	//DisableCursor();
 }
 
 // ******************

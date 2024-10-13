@@ -18,7 +18,7 @@ enum Tools
 {
 	PIXEL,
 	LINE,
-	BUCKET,
+	FILL,
 	MULTI,
 };
 
