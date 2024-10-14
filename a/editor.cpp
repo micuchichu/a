@@ -3,7 +3,8 @@
 Editor::Editor()
 {
 	resources = ResourceManager::GetInstance();
-	shader = LoadShader("vertex.vs", 0);
+	shader = LoadShader("vertex.vs", "fragment.fs");
+	SetShaderValue(shader, GetShaderLocation(shader ,"time"), &time, SHADER_UNIFORM_FLOAT);
 
 	initCamera();
 	initTools();
@@ -55,6 +56,9 @@ void Editor::Draw()
 
 void Editor::Update()
 {
+	SetShaderValue(shader, GetShaderLocation(shader, "time"), &time, SHADER_UNIFORM_FLOAT);
+
+	time = GetTime();
 	len = 0;
 	len2 = 0;
 	UpdateCameraNew(&cam3d, CAMERA_ORBITAL);

@@ -98,6 +98,8 @@ private:
 	char tiles[sizeY][sizeX];
 	char buffer[sizeY][sizeX];
 
+	float time;
+
 	Model model = { 0 };
 
 	RenderTexture2D view3D;

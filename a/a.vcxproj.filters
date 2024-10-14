@@ -82,7 +82,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.fs" />
-    <None Include="vertex.vs" />
+    <None Include="fragment.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="vertex.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
