@@ -16,6 +16,6 @@ void main()
     fragTexCoord = vertexTexCoord; 
     fragColor = vertexColor;
     vec4 pos = vec4(vertexPosition, 1.0);
-    pos.y *= sin(pos.x + time);
+    pos.y *= clamp(sin(pos.x * 10.0f + time), 0.5, 1.0);
     gl_Position = mvp * pos; 
 }

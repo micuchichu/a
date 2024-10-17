@@ -23,6 +23,15 @@ enum Tools
 	TMULTI,
 };
 
+struct BlocData
+{
+	int stoneTotal = 0;
+	int slabTotal = 0;
+	int wallTotal = 0;
+	int floors = 1;
+	int concreteTotal = 0;
+};
+
 class Editor : public Scene
 {
 public:
@@ -51,9 +60,6 @@ private:
 	void onWindowResize();
 
 	void updateModel();
-	//void updateSaveMenu();
-	//void updateLoadMenu();
-
 	void updateTiles();
 
 	void updateLeftClickPressed(Vector2& mouse);
@@ -66,20 +72,13 @@ private:
 	void calculateResources();
 	void loadSaves();
 
-	// Data
-	int stoneTotal = 0;
-	int slabTotal = 0;
-	int wallTotal = 0;
-	int floors = 1;
-	int concreteTotal = 0;
+	BlocData data;
 
 	// Tools related
 	Vector2 A, B;
 
 	char tool = Tools::TMULTI;
 	int len, len2;
-
-	std::vector<int> textures;
 
 	// save/load related
 	std::vector<std::string> saves;
@@ -102,14 +101,12 @@ private:
 
 	Model model = { 0 };
 
-	RenderTexture2D view3D;
-
-	ResourceManager* resources;
-
-	Shader shader;
+	Shader* shader;
+	Material* bloc;
+	RenderTexture* render;
 
 	Camera2D cam;
 	Camera cam3d;
 
-	Material bloc;
+	ResourceManager* resources;
 };
