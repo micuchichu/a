@@ -1,13 +1,14 @@
 #pragma once
 
 #include "raylib.h"
+#include "rlgl.h"
 #include "imgui.h"
 #include "rlImGui.h"
 
 #include "resourceManager.h"
 #include "utils.h"
 #include "globals.h"
-#include "gui.h"
+//#include "gui.h"
 #include "scene.h"
 
 #include <iostream>
@@ -54,6 +55,7 @@ private:
 	void drawSaveMenu();
 	void drawLoadMenu();
 	void drawTiles();
+	void drawTools();
 	void drawModel();
 
 	// Update functions

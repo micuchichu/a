@@ -16,13 +16,18 @@ Editor::Editor()
 
 	resources->ResLoadRenderTexture(GetScreenWidth() / 2 + 100, ImGui::GetMainViewport()->Size.y);
 	render = resources->GetRenderTexture(RenderTextures::EDITOR_RENDER); 
+
+	//rlEnableShader(shader->id);
+	//std::cout << "shader id: " << shader->id << std::endl;
+	//model.materials[0].shader = *shader;
 }
 
 void Editor::Draw()
 {
-	BeginShaderMode(*shader);
+	//BeginShaderMode(*shader);
 	DrawTexturePro(render->texture, {0, 0, (float)render->texture.width, -(float)render->texture.height}, {GetScreenWidth() * 0.5f - 100, 0, (float)render->texture.width, (float)render->texture.height}, {0, 0}, 0, WHITE);
-	EndShaderMode();
+	DrawRectangleLines(GetScreenWidth() * 0.5f - 100, 0, render->texture.width, -render->texture.height, BLACK);
+	//EndShaderMode();
 
 	BeginMode2D(cam);
 
@@ -40,17 +45,7 @@ void Editor::Draw()
 	drawSaveMenu();
 	drawLoadMenu();
 
-	if (ImGui::Begin("Tools"))
-	{
-		if (ImGui::Button("Multitool")) tool = Tools::TMULTI;
-		if (ImGui::Button("Pencil")) tool = Tools::TPIXEL;
-		if (ImGui::Button("Line")) tool = Tools::TLINE;
-		if (ImGui::Button("Bucket")) tool = Tools::TFILL;
-
-		ImGui::Text("Current Tool: %d", tool);
-	}
-
-	ImGui::End();
+	drawTools();
 
 	drawTotals(0, 0);
 
@@ -127,7 +122,7 @@ void Editor::drawTotals(int x, int y)
 	//DrawText(TextFormat("Walls: %d", wallTotal), x + 10, y + 70, 30, GRAY);
 	//DrawText(TextFormat("Concrete: %d", concreteTotal), x + 10, y + 100, 30, GRAY);
 	//DrawText(TextFormat("Floors: %d", floors - 1), x + 10, y + 130, 30, GRAY);
-	//DrawText(TextFormat("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal), x + 190, y + 10, 30, GRAY
+	//DrawText(TextFormat("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal), x + 190, y + 10, 30, GRAY);
 
 }
 
@@ -249,6 +244,21 @@ void Editor::drawTiles()
 	}
 }
 
+void Editor::drawTools()
+{
+	if (ImGui::Begin("Tools"))
+	{
+		if (ImGui::Button("Multitool")) tool = Tools::TMULTI;
+		if (ImGui::Button("Pencil")) tool = Tools::TPIXEL;
+		if (ImGui::Button("Line")) tool = Tools::TLINE;
+		if (ImGui::Button("Bucket")) tool = Tools::TFILL;
+
+		ImGui::Text("Current Tool: %d", tool);
+	}
+
+	ImGui::End();
+}
+
 void Editor::drawModel()
 {
 	bool p_open = true;
@@ -282,9 +292,10 @@ void Editor::updateModel()
 
 	BeginShaderMode(*shader);
 
-	for (int i = 0; i < model.meshCount; i++)
-		DrawMesh(model.meshes[i], *bloc, model.transform);
-	//DrawModel(model, { 0, 0, 0 }, 1, WHITE);
+	//for (int i = 0; i < model.meshCount; i++)
+	//	DrawMesh(model.meshes[i], *bloc, model.transform);
+
+	DrawModel(model, { 0, 0, 0 }, 1, WHITE);
 
 	//DrawModelWires(model, {0, 0, 0}, 1, BLACK);
 
@@ -347,15 +358,17 @@ void Editor::updateLeftClickRelease()
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = std::abs(B2.y - A2.y + 1);
 			for (int i = A2.y + 1; i < B2.y; i++)
 				tiles[i][(int)A2.x] = 1;
+			tiles[(int)B2.y][(int)A2.x] = 0;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = std::abs(B2.x - A2.x + 1);
 			for (int i = A2.x + 1; i < B2.x; i++)
 				tiles[(int)A2.y][i] = 1;
+			tiles[(int)A2.y][(int)B2.x] = 0;
 		}
 		else
 		{
@@ -379,8 +392,8 @@ void Editor::updateLeftClickRelease()
 					tiles[i][(int)B2.x] = 1;
 			}
 
-			len = B2.x - A.x - 1;
-			len2 = B2.y - A2.y - 1;
+			len = std::abs(B2.x - A2.x + 1);
+			len2 = std::abs(B2.y - A2.y + 1);
 			for (int i = A2.x + 1; i < B2.x; i++)
 				for (int j = A2.y + 1; j < B2.y; j++)
 					tiles[j][i] = 2;
@@ -391,13 +404,13 @@ void Editor::updateLeftClickRelease()
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = B2.y - A2.y + 1;
 			for (int i = A2.y + 1; i < B2.y; i++)
 				tiles[i][(int)A2.x] = 1;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = B2.x - A2.x + 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
 				tiles[(int)A2.y][i] = 1;
 		}
@@ -422,15 +435,17 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = B2.y - A2.y + 1;
 			for (int i = A2.y + 1; i < B2.y; i++)
 				buffer[i][(int)A2.x] = 1;
+			buffer[(int)B2.y][(int)A2.x] = 0;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = B2.x - A2.x + 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
 				buffer[(int)A2.y][i] = 1;
+			buffer[(int)A2.y][(int)B2.x] = 0;
 		}
 		else
 		{
@@ -454,8 +469,8 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 					buffer[i][(int)B2.x] = 1;
 			}
 
-			len = B2.x - A.x - 1;
-			len2 = B2.y - A2.y - 1;
+			len = std::abs(B2.x - A2.x + 1);
+			len2 = std::abs(B2.y - A2.y + 1);
 			for (int i = A2.x + 1; i < B2.x; i++)
 				for (int j = A2.y + 1; j < B2.y; j++)
 					buffer[j][i] = 2;
@@ -466,13 +481,13 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = B2.y - A2.y + 1;
 			for (int i = A2.y + 1; i < B2.y; i++)
 				buffer[i][(int)A2.x] = 1;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = B2.x - A2.x + 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
 				buffer[(int)A2.y][i] = 1;
 		}
