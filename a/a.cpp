@@ -7,9 +7,13 @@
 
 int main()
 {
+<<<<<<< HEAD
 	InitWindow(1080, 1080, "caca");
 
 	Texture2D arena = LoadTexture("./textures/arena.png");
+=======
+	SetWindowState(FLAG_WINDOW_RESIZABLE);
+>>>>>>> parent of 1037193 (pull)
 
 	std::vector<Vector2> points;
 	Vector2* selected = nullptr;
@@ -18,6 +22,21 @@ int main()
 
 	SetTargetFPS(60);
 
+<<<<<<< HEAD
+=======
+	rlImGuiSetup(true);
+
+	ImGuiStyleSetup();
+
+	LoadTextures();
+
+	Scene* scenes[SCENE_COUNT];
+	scenes[0] = new Editor;
+	scenes[1] = new Planner;
+
+	int menu = EDITOR;
+
+>>>>>>> parent of 1037193 (pull)
 	while (!WindowShouldClose())
 	{
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
