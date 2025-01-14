@@ -8,10 +8,13 @@
 int main()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	InitWindow(1080, 1080, "caca");
 
 	Texture2D arena = LoadTexture("./textures/arena.png");
 =======
+=======
+>>>>>>> parent of 1037193 (pull)
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 >>>>>>> parent of 1037193 (pull)
 
