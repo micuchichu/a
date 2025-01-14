@@ -139,30 +139,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="a.cpp" />
-    <ClCompile Include="editor.cpp" />
     <ClCompile Include="libs\imgui.cpp" />
     <ClCompile Include="libs\imgui_demo.cpp" />
     <ClCompile Include="libs\imgui_draw.cpp" />
     <ClCompile Include="libs\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui_widgets.cpp" />
     <ClCompile Include="libs\rlImGui.cpp" />
-    <ClCompile Include="planner.cpp" />
-    <ClCompile Include="gui.cpp" />
-    <ClCompile Include="resourceManager.cpp" />
-    <ClCompile Include="scene.cpp" />
-    <ClCompile Include="utils.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="editor.h" />
-    <ClInclude Include="gui.h" />
-    <ClInclude Include="planner.h" />
-    <ClInclude Include="resourceManager.h" />
-    <ClInclude Include="scene.h" />
-    <ClInclude Include="utils.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="fragment.fs" />
-    <None Include="vertex.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,80 +1,79 @@
 #include "raylib.h"
-#include "editor.h"
-#include "planner.h"
+#include "raymath.h"
+#include <iostream>
+#include <vector>
 
-#define SCENE_COUNT 2
-
-enum Menus
-{
-	EDITOR,
-	PLANNER
-};
+#define POINT_RADIUS 10
 
 int main()
 {
-	std::cout << "Editor size: " << sizeof(Editor) << std::endl;
-	std::cout << "Planner size: " << sizeof(Planner) << std::endl;
+	InitWindow(1080, 1080, "caca");
 
-	SetWindowState(FLAG_WINDOW_RESIZABLE);
+	Texture2D arena = LoadTexture("./textures/arena.png");
 
-	InitWindow(800, 600, "caca");
+	std::vector<Vector2> points;
+	Vector2* selected = nullptr;
+	Vector2* path = nullptr;
+	int pathLen = 0;
 
 	SetTargetFPS(60);
 
-	rlImGuiSetup(true);
-
-	ImGuiStyleSetup();
-
-	LoadTextures();
-	LoadShaders();
-	LoadRenderTextures();
-
-	Scene* scenes[SCENE_COUNT];
-	scenes[0] = new Editor;
-	scenes[1] = new Planner;
-
-	int menu = EDITOR;
-
 	while (!WindowShouldClose())
 	{
-		scenes[menu]->Update();
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+		{
+			for (auto& i : points)
+			{
+				if (Vector2Distance(GetMousePosition(), i) <= 20)
+				{
+					selected = &i;
+					break;
+				}
+				selected = nullptr;
+			}
+			
+			if(selected == nullptr)
+				points.push_back(GetMousePosition());
+		}
 
-		for (int i = 0; i < SCENE_COUNT; i++)
-			scenes[i]->BackgroundUpdates();
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+		{
+			if(selected != nullptr)
+				*selected = GetMousePosition();
+		}
 
-		//if (IsKeyPressed('N'))
-		//{
-		//	//menu++;
-		//	scenes[menu]->OnSwitch();
-		//}
-		//if (menu > SCENE_COUNT - 1) menu = 0;
+		if (IsKeyPressed(KEY_DELETE))
+		{
+			for (int i = 0; i < points.size(); i++)
+			{
+				if (&points[i] == selected) 
+				{
+					points.erase(points.begin() + i);
+					selected = nullptr;
+				}
+			}
+		}
 
 		BeginDrawing();
 		ClearBackground(WHITE);
-		rlImGuiBegin();
 
-		ImGui::BeginMainMenuBar();
-
-		if (ImGui::MenuItem("Editor")) 
-		{ 
-			menu = EDITOR;
-			scenes[menu]->OnSwitch();
-		}
-
-		if (ImGui::MenuItem("Planner"))
+		DrawTexture(arena, 0, 0, WHITE);
+	
+		for (auto& i : points)
 		{
-			menu = PLANNER;
-			scenes[menu]->OnSwitch();
+			DrawCircleV(i, 10, GREEN);
+			if (selected == &i)
+				DrawCircleV(i, 10, {255, 255, 255, 120});
 		}
 
-		ImGui::EndMainMenuBar();
-
-		//ImGui::ShowDemoWindow();
-		scenes[menu]->Draw();
-
-		rlImGuiEnd();
-
+		for (int i = 0; i < points.size() - 1 && points.size() >= 2; i++)
+		{
+			DrawLineV(points[i], points[i + 1], GREEN);
+			//DrawSplineBezierQuadratic(path, pathLen, 4, GREEN);
+		}
+	
 		EndDrawing();
 	}
+
 	CloseWindow();
 }
