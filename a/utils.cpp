@@ -89,23 +89,25 @@ void UpdateTransform(Model& model, Vector3 pos)
 void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, int* vertexCount, int* indexCount, Vector2* texcoords, Vector3* normals, Vector3 pos, float width, float height, float depth, Color color)
 {
     Vector3 cubeVertices[] = {
-        { pos.x, pos.y, pos.z },
-        { pos.x + width, pos.y, pos.z },
-        { pos.x, pos.y + height, pos.z },
-        { pos.x + width, pos.y + height, pos.z },
-        { pos.x, pos.y, pos.z + depth },
-        { pos.x + width, pos.y, pos.z + depth },
-        { pos.x, pos.y + height, pos.z + depth },
-        { pos.x + width, pos.y + height, pos.z + depth}
+        { pos.x, pos.y, pos.z },                            // 1
+        { pos.x + width, pos.y, pos.z },                    // 2
+        { pos.x, pos.y + height, pos.z },                   // 3 
+        { pos.x + width, pos.y + height, pos.z },           // 4
+        { pos.x, pos.y, pos.z + depth },                    // 5
+        { pos.x + width, pos.y, pos.z + depth },            // 6
+        { pos.x, pos.y + height, pos.z + depth },           // 7
+        { pos.x + width, pos.y + height, pos.z + depth}     // 8
     };
 
     Vector3 cubeNormals[] = {
-        { 0.0f, 0.0f, -1.0f },  // Front face
-        { 1.0f, 0.0f, 0.0f },   // Right face
-        { 0.0f, 0.0f, 1.0f },   // Back face
-        { -1.0f, 0.0f, 0.0f },  // Left face
-        { 0.0f, 1.0f, 0.0f },   // Top face
-        { 0.0f, -1.0f, 0.0f }   // Bottom face
+        { -1.0f, -1.0f, -1.0f }, // 1
+        { 1.0f, -1.0f, -1.0f },  // 2 
+        { -1.0f, 1.0f, -1.0f },  // 3
+        { 1.0f, 1.0f, -1.0f },   // 4
+        { -1.0f, -1.0f, 1.0f },  // 5
+        { 1.0f, -1.0f, 1.0f },   // 6
+        { -1.0f, 1.0f, 1.0f },   // 7
+        { 1.0f, 1.0f, 1.0f }     // 8
     };
 
     unsigned short cubeIndices[36] = {
@@ -507,7 +509,7 @@ Matrix GetCameraProjectionMatrix(Camera* camera, float aspect)
 void UpdateCameraNew(Camera* camera, int mode)
 {
     Vector2 mousePositionDelta = { 0 };
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    if (IsCursorHidden())
         mousePositionDelta = GetMouseDelta();
 
     bool moveInWorldPlane = ((mode == CAMERA_FIRST_PERSON) || (mode == CAMERA_THIRD_PERSON));
@@ -563,7 +565,7 @@ void UpdateCameraNew(Camera* camera, int mode)
     {
         if (GetMouseWheelMove() > 0)
             CAMERA_MOVE_SPEED *= 1.1f;
-        else if(GetMouseWheelMove() < 0)
+        else if (GetMouseWheelMove() < 0)
             CAMERA_MOVE_SPEED /= 1.1f;
     }
 }

@@ -1,21 +1,32 @@
 #version 330
 
-attribute vec3 vertexPosition;
-attribute vec2 vertexTexCoord;            
-attribute vec4 vertexColor;
+// Input vertex attributes
+in vec3 vertexPosition;
+in vec2 vertexTexCoord;
+in vec3 vertexNormal;
+in vec4 vertexColor;
 
-uniform mat4 mvp;        
+// Input uniform values
+uniform mat4 mvp;
+uniform mat4 matModel;
+uniform mat4 matNormal;
 
-out vec2 fragTexCoord;             
-out vec4 fragColor;       
+// Output vertex attributes (to fragment shader)
+out vec3 fragPosition;
+out vec2 fragTexCoord;
+out vec4 fragColor;
+out vec3 fragNormal;
 
-uniform float time;
+// NOTE: Add here your custom variables
 
-void main()                        
-{             
-    fragTexCoord = vertexTexCoord; 
+void main()
+{
+    // Send vertex attributes to fragment shader
+    fragPosition = vec3(matModel*vec4(vertexPosition, 1.0));
+    fragTexCoord = vertexTexCoord;
     fragColor = vertexColor;
-    vec4 pos = vec4(vertexPosition, 1.0);
-    pos.y += sin(pos.x / (10.0f * time));
-    gl_Position = mvp * pos; 
+    fragNormal = normalize(vec3(matNormal*vec4(vertexNormal, 1.0)));
+
+    // Calculate final vertex position
+    gl_Position = mvp*vec4(vertexPosition, 1.0);
 }

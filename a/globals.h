@@ -17,6 +17,21 @@ enum Textures
 	SLAB
 };
 
+enum RenderTextures
+{
+	EDITOR_RENDER
+};
+
+enum Shaders
+{
+	EDITOR_SHADER
+};
+
+enum Materials
+{
+	BLOC_MATERIAL
+};
+
 inline void LoadTextures()
 {
 	ResourceManager* resources = ResourceManager::GetInstance();
@@ -29,4 +44,16 @@ inline void LoadTextures()
 	resources->ResLoadTexture("textures/pillar.png");
 	resources->ResLoadTexture("textures/wall.png");
 	resources->ResLoadTexture("textures/slab.png");
+}
+
+inline void LoadRenderTextures()
+{
+	ResourceManager* resources = ResourceManager::GetInstance();
+}
+
+inline void LoadShaders()
+{
+	ResourceManager* resources = ResourceManager::GetInstance();
+
+	resources->ResLoadShader("vertex.vs", "fragment.fs");
 }

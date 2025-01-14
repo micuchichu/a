@@ -1,13 +1,14 @@
 #pragma once
 
 #include "raylib.h"
+#include "rlgl.h"
 #include "imgui.h"
 #include "rlImGui.h"
 
 #include "resourceManager.h"
 #include "utils.h"
 #include "globals.h"
-#include "gui.h"
+//#include "gui.h"
 #include "scene.h"
 
 #include <iostream>
@@ -21,6 +22,15 @@ enum Tools
 	TLINE,
 	TFILL,
 	TMULTI,
+};
+
+struct BlocData
+{
+	int stoneTotal = 0;
+	int slabTotal = 0;
+	int wallTotal = 0;
+	int floors = 1;
+	int concreteTotal = 0;
 };
 
 class Editor : public Scene
@@ -45,15 +55,13 @@ private:
 	void drawSaveMenu();
 	void drawLoadMenu();
 	void drawTiles();
+	void drawTools();
 	void drawModel();
 
 	// Update functions
 	void onWindowResize();
 
 	void updateModel();
-	//void updateSaveMenu();
-	//void updateLoadMenu();
-
 	void updateTiles();
 
 	void updateLeftClickPressed(Vector2& mouse);
@@ -66,20 +74,13 @@ private:
 	void calculateResources();
 	void loadSaves();
 
-	// Data
-	int stoneTotal = 0;
-	int slabTotal = 0;
-	int wallTotal = 0;
-	int floors = 1;
-	int concreteTotal = 0;
+	BlocData data;
 
 	// Tools related
 	Vector2 A, B;
 
 	char tool = Tools::TMULTI;
 	int len, len2;
-
-	std::vector<int> textures;
 
 	// save/load related
 	std::vector<std::string> saves;
@@ -102,14 +103,12 @@ private:
 
 	Model model = { 0 };
 
-	RenderTexture2D view3D;
-
-	ResourceManager* resources;
-
-	Shader shader;
+	Shader* shader;
+	Material* bloc;
+	RenderTexture* render;
 
 	Camera2D cam;
 	Camera cam3d;
 
-	Material bloc;
+	ResourceManager* resources;
 };

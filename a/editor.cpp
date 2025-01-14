@@ -2,22 +2,32 @@
 
 Editor::Editor()
 {
-	resources = ResourceManager::GetInstance();
-	shader = LoadShader("vertex.vs", "fragment.fs");
-	SetShaderValue(shader, GetShaderLocation(shader ,"time"), &time, SHADER_UNIFORM_FLOAT);
-
 	initCamera();
 	initTools();
-	bloc = LoadMaterialDefault();
-	bloc.maps[MATERIAL_MAP_DIFFUSE].texture = resources->GetTexture(Textures::PILLAR);
-	//bloc.shader = shader;
+
+	resources = ResourceManager::GetInstance();
+	
+	shader = resources->GetShader(Shaders::EDITOR_SHADER);
+	shader->locs[SHADER_LOC_COLOR_AMBIENT] = GetShaderLocation(*shader, "time");
+
+	resources->ResLoadMaterial();
+	resources->MaterialAddTexture(Materials::BLOC_MATERIAL, Textures::PILLAR);
+	bloc = resources->GetMaterial(Materials::BLOC_MATERIAL);
+
+	resources->ResLoadRenderTexture(GetScreenWidth() / 2 + 100, ImGui::GetMainViewport()->Size.y);
+	render = resources->GetRenderTexture(RenderTextures::EDITOR_RENDER); 
+
+	//rlEnableShader(shader->id);
+	//std::cout << "shader id: " << shader->id << std::endl;
+	//model.materials[0].shader = *shader;
 }
 
 void Editor::Draw()
 {
-	BeginShaderMode(shader);
-	DrawTexturePro(view3D.texture, { 0, 0, (float)view3D.texture.width, -(float)view3D.texture.height }, { GetScreenWidth() * 0.5f - 100, 0, (float)view3D.texture.width, (float)view3D.texture.height }, { 0, 0 }, 0, WHITE);
-	EndShaderMode();
+	//BeginShaderMode(*shader);
+	DrawTexturePro(render->texture, {0, 0, (float)render->texture.width, -(float)render->texture.height}, {GetScreenWidth() * 0.5f - 100, 0, (float)render->texture.width, (float)render->texture.height}, {0, 0}, 0, WHITE);
+	DrawRectangleLines(GetScreenWidth() * 0.5f - 100, 0, render->texture.width, -render->texture.height, BLACK);
+	//EndShaderMode();
 
 	BeginMode2D(cam);
 
@@ -35,17 +45,7 @@ void Editor::Draw()
 	drawSaveMenu();
 	drawLoadMenu();
 
-	if (ImGui::Begin("Tools"))
-	{
-		if (ImGui::Button("Multitool")) tool = Tools::TMULTI;
-		if (ImGui::Button("Pencil")) tool = Tools::TPIXEL;
-		if (ImGui::Button("Line")) tool = Tools::TLINE;
-		if (ImGui::Button("Bucket")) tool = Tools::TFILL;
-
-		ImGui::Text("Current Tool: %d", tool);
-	}
-
-	ImGui::End();
+	drawTools();
 
 	drawTotals(0, 0);
 
@@ -56,7 +56,7 @@ void Editor::Draw()
 
 void Editor::Update()
 {
-	SetShaderValue(shader, GetShaderLocation(shader, "time"), &time, SHADER_UNIFORM_FLOAT);
+	SetShaderValue(*shader, shader->locs[SHADER_LOC_COLOR_AMBIENT], &time, SHADER_UNIFORM_FLOAT);
 
 	time = GetTime();
 	len = 0;
@@ -69,8 +69,8 @@ void Editor::Update()
 	{
 		updateTools();
 
-		floors += IsKeyPressed(KEY_UP);
-		floors -= IsKeyPressed(KEY_DOWN) * (floors > 1);
+		data.floors += IsKeyPressed(KEY_UP);
+		data.floors -= IsKeyPressed(KEY_DOWN) * (data.floors > 1);
 	}
 
 	updateModel();
@@ -107,12 +107,12 @@ void Editor::drawTotals(int x, int y)
 	
 	ImGui::Begin("Resources", &p_open, flags);
 	
-	ImGui::Text("Stone: %d", stoneTotal);
-	ImGui::Text("Slabs: %d", slabTotal);
-	ImGui::Text("Walls: %d", wallTotal);
-	ImGui::Text("Concrete: %d", concreteTotal);
-	ImGui::Text("Floors: %d", floors - 1);
-	ImGui::Text("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal);
+	ImGui::Text("Stone: %d", data.stoneTotal);
+	ImGui::Text("Slabs: %d", data.slabTotal);
+	ImGui::Text("Walls: %d", data.wallTotal);
+	ImGui::Text("Concrete: %d", data.concreteTotal);
+	ImGui::Text("Floors: %d", data.floors - 1);
+	ImGui::Text("Total Stone: %d", data.stoneTotal + data.slabTotal / 2 + data.wallTotal);
 
 	ImGui::End();
 
@@ -122,7 +122,7 @@ void Editor::drawTotals(int x, int y)
 	//DrawText(TextFormat("Walls: %d", wallTotal), x + 10, y + 70, 30, GRAY);
 	//DrawText(TextFormat("Concrete: %d", concreteTotal), x + 10, y + 100, 30, GRAY);
 	//DrawText(TextFormat("Floors: %d", floors - 1), x + 10, y + 130, 30, GRAY);
-	//DrawText(TextFormat("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal), x + 190, y + 10, 30, GRAY
+	//DrawText(TextFormat("Total Stone: %d", stoneTotal + slabTotal / 2 + wallTotal), x + 190, y + 10, 30, GRAY);
 
 }
 
@@ -167,7 +167,7 @@ void Editor::drawSaveMenu()
 					for (int j = 0; j < sizeX; j++)
 						save << tiles[i][j] << " ";
 
-				save << floors;
+				save << data.floors;
 
 				p_open = false;
 			}
@@ -210,7 +210,7 @@ void Editor::drawLoadMenu()
 							load >> tiles[j][k];
 
 					if (!load.eof())
-						load >> floors;
+						load >> data.floors;
 				}
 			}
 			ImGui::EndTable();
@@ -244,6 +244,21 @@ void Editor::drawTiles()
 	}
 }
 
+void Editor::drawTools()
+{
+	if (ImGui::Begin("Tools"))
+	{
+		if (ImGui::Button("Multitool")) tool = Tools::TMULTI;
+		if (ImGui::Button("Pencil")) tool = Tools::TPIXEL;
+		if (ImGui::Button("Line")) tool = Tools::TLINE;
+		if (ImGui::Button("Bucket")) tool = Tools::TFILL;
+
+		ImGui::Text("Current Tool: %d", tool);
+	}
+
+	ImGui::End();
+}
+
 void Editor::drawModel()
 {
 	bool p_open = true;
@@ -256,7 +271,7 @@ void Editor::drawModel()
 
 	if (ImGui::Begin("Render", &p_open, flags)) 
 	{
-		rlImGuiImageRenderTexture(&view3D);
+		rlImGuiImageRenderTexture(render);
 	}
 	ImGui::End();
 }
@@ -265,21 +280,22 @@ void Editor::drawModel()
 
 void Editor::onWindowResize()
 {
-	view3D = LoadRenderTexture(GetScreenWidth() / 2 + 100, ImGui::GetMainViewport()->Size.y);
+	resources->ReloadRenderTexture(RenderTextures::EDITOR_RENDER, GetScreenWidth() / 2 + 100, ImGui::GetMainViewport()->Size.y);
 }
 
 void Editor::updateModel()
 {
-	BeginTextureMode(view3D);
+	BeginTextureMode(*render);
 	ClearBackground(WHITE);
 
 	BeginMode3D(cam3d);
 
-	BeginShaderMode(shader);
+	BeginShaderMode(*shader);
 
-	for (int i = 0; i < model.meshCount; i++)
-		DrawMesh(model.meshes[i], bloc, model.transform);
-	//DrawModel(model, { 0, 0, 0 }, 1, WHITE);
+	//for (int i = 0; i < model.meshCount; i++)
+	//	DrawMesh(model.meshes[i], *bloc, model.transform);
+
+	DrawModel(model, { 0, 0, 0 }, 1, WHITE);
 
 	//DrawModelWires(model, {0, 0, 0}, 1, BLACK);
 
@@ -310,7 +326,7 @@ void Editor::updateTiles()
 		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
 		{
 			updateLeftClickRelease();
-			model = createSingleModel(tiles, floors);
+			model = createSingleModel(tiles, data.floors);
 			calculateResources();
 		}
 
@@ -321,7 +337,7 @@ void Editor::updateTiles()
 
 		if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
 		{
-			model = createSingleModel(tiles, floors);
+			model = createSingleModel(tiles, data.floors);
 			calculateResources();
 		}
 	}
@@ -342,15 +358,17 @@ void Editor::updateLeftClickRelease()
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = std::abs(B2.y - A2.y + 1);
 			for (int i = A2.y + 1; i < B2.y; i++)
 				tiles[i][(int)A2.x] = 1;
+			tiles[(int)B2.y][(int)A2.x] = 0;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = std::abs(B2.x - A2.x + 1);
 			for (int i = A2.x + 1; i < B2.x; i++)
 				tiles[(int)A2.y][i] = 1;
+			tiles[(int)A2.y][(int)B2.x] = 0;
 		}
 		else
 		{
@@ -374,8 +392,8 @@ void Editor::updateLeftClickRelease()
 					tiles[i][(int)B2.x] = 1;
 			}
 
-			len = B2.x - A.x - 1;
-			len2 = B2.y - A2.y - 1;
+			len = std::abs(B2.x - A2.x + 1);
+			len2 = std::abs(B2.y - A2.y + 1);
 			for (int i = A2.x + 1; i < B2.x; i++)
 				for (int j = A2.y + 1; j < B2.y; j++)
 					tiles[j][i] = 2;
@@ -386,13 +404,13 @@ void Editor::updateLeftClickRelease()
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = B2.y - A2.y + 1;
 			for (int i = A2.y + 1; i < B2.y; i++)
 				tiles[i][(int)A2.x] = 1;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = B2.x - A2.x + 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
 				tiles[(int)A2.y][i] = 1;
 		}
@@ -417,15 +435,17 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = B2.y - A2.y + 1;
 			for (int i = A2.y + 1; i < B2.y; i++)
 				buffer[i][(int)A2.x] = 1;
+			buffer[(int)B2.y][(int)A2.x] = 0;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = B2.x - A2.x + 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
 				buffer[(int)A2.y][i] = 1;
+			buffer[(int)A2.y][(int)B2.x] = 0;
 		}
 		else
 		{
@@ -449,8 +469,8 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 					buffer[i][(int)B2.x] = 1;
 			}
 
-			len = B2.x - A.x - 1;
-			len2 = B2.y - A2.y - 1;
+			len = std::abs(B2.x - A2.x + 1);
+			len2 = std::abs(B2.y - A2.y + 1);
 			for (int i = A2.x + 1; i < B2.x; i++)
 				for (int j = A2.y + 1; j < B2.y; j++)
 					buffer[j][i] = 2;
@@ -461,13 +481,13 @@ void Editor::updateLeftClickDown(Vector2& mouse)
 	{
 		if (A.x == B.x)
 		{
-			len = B2.y - A2.y - 1;
+			len = B2.y - A2.y + 1;
 			for (int i = A2.y + 1; i < B2.y; i++)
 				buffer[i][(int)A2.x] = 1;
 		}
 		else if (A.y == B.y)
 		{
-			len = B2.x - A2.x - 1;
+			len = B2.x - A2.x + 1;
 			for (int i = A2.x + 1; i < B2.x; i++)
 				buffer[(int)A2.y][i] = 1;
 		}
@@ -498,7 +518,7 @@ void Editor::updateLeftClickPressed(Vector2& mouse)
 		A = { (float)x, (float)y };
 		break;
 	}
-	model = createSingleModel(tiles, floors);
+	model = createSingleModel(tiles, data.floors);
 }
 
 void Editor::updateRightClickPressed(Vector2& mouse)
@@ -559,26 +579,26 @@ void Editor::updateTools()
 
 void Editor::calculateResources()
 {
-	stoneTotal = 0;
-	wallTotal = 0;
-	slabTotal = 0;
-	concreteTotal = 0;
+	data.stoneTotal = 0;
+	data.wallTotal = 0;
+	data.slabTotal = 0;
+	data.concreteTotal = 0;
 	for (int i = 0; i < sizeY; i++)
 	{
 		for (int j = 0; j < sizeX; j++)
 		{
 			if (tiles[i][j] == 0)
-				stoneTotal += 4 * floors;
+				data.stoneTotal += 4 * data.floors;
 			else if (tiles[i][j] == 1)
 			{
-				stoneTotal += floors;
+				data.stoneTotal += data.floors;
 				if (tiles[i + 1][j] + 1 && tiles[i - 1][j] + 1 && tiles[i][j + 1] + 1 && tiles[i][j - 1] + 1)
-					wallTotal += 3 * floors;
+					data.wallTotal += 3 * data.floors;
 				else
-					concreteTotal += 3 * floors;
+					data.concreteTotal += 3 * data.floors;
 			}
 			if (tiles[i][j] == 2)
-				slabTotal += floors;
+				data.slabTotal += data.floors;
 		}
 	}
 }
@@ -605,8 +625,6 @@ void Editor::initTools()
 
 void Editor::initCamera()
 {
-	view3D = LoadRenderTexture(GetScreenWidth() / 2 + 100, GetScreenHeight());
-
 	cam.offset = { sizeX * tileSize * 0.25f, sizeY * tileSize * 0.25f };
 	cam.rotation = 0;
 	cam.target = { 0, 0 };

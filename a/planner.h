@@ -9,6 +9,18 @@
 #include <filesystem>
 #include <string>
 
+struct blocData
+{
+	Model model;
+	RenderTexture info;
+	int floors;
+
+	int stoneTotal = 0;
+	int slabTotal = 0;
+	int wallTotal = 0;
+	int concreteTotal = 0;
+};
+
 class Planner : public Scene
 {
 public:
@@ -20,16 +32,22 @@ public:
 	void OnSwitch() override;
 
 private:
-	void loadModels();
-	void initCamera();
-
 	// Update functions
 	void onWindowResize();
 
 	// Draw functions
+	void drawTools();
+	void drawBlocs();
+	void drawInfo();
+
+	void loadModels();
+	void initCamera();
+
+	bool cameraActive;
 
 	Camera cam3d;
 	Camera2D cam;
 
-	std::vector<Model> blocs;
+	std::vector<blocData> blocs;
+	std::vector<std::string> saves;
 };

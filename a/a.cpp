@@ -12,6 +12,9 @@ enum Menus
 
 int main()
 {
+	std::cout << "Editor size: " << sizeof(Editor) << std::endl;
+	std::cout << "Planner size: " << sizeof(Planner) << std::endl;
+
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 
 	InitWindow(800, 600, "caca");
@@ -23,6 +26,8 @@ int main()
 	ImGuiStyleSetup();
 
 	LoadTextures();
+	LoadShaders();
+	LoadRenderTextures();
 
 	Scene* scenes[SCENE_COUNT];
 	scenes[0] = new Editor;
