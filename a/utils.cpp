@@ -120,7 +120,7 @@ void addCubeVertices(Vector3* vertices, Color* colors, unsigned short* indices, 
         // Top face
         2, 6, 7, 7, 3, 2,
         // Bottom face
-        5, 4, 0, 0, 1, 5
+        0, 1, 5, 5, 4, 0
     };
 
     Vector2 cubeTexcoords[] = {
